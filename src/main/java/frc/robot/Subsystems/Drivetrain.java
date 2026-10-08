@@ -2,6 +2,7 @@ package frc.robot.Subsystems;
 
 import static edu.wpi.first.units.Units.Amp;
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Feet;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
@@ -20,22 +21,30 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import com.studica.frc.AHRS;
+import com.studica.frc.AHRS.NavXComType;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelPositions;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -58,6 +67,8 @@ public class Drivetrain extends SubsystemBase {
 
     private final SysIdRoutine sysIdRoutine;
 
+    private GenericEntry sb_matchTimer;
+
     public final Command sysIdCommandUpQuasi;
     public final Command sysIdCommandDownQuasi;
     public final Command sysIdCommandUpDyn;
@@ -71,6 +82,8 @@ public class Drivetrain extends SubsystemBase {
     private final SimpleMotorFeedforward driveFF;
     private final PIDController anglePID;
 
+    private AHRS navx;
+
     private Distance startDistanceL = Meters.of(0);
     private Distance startDistanceR = Meters.of(0);
     private Angle startAngle = Rotations.zero();
@@ -78,10 +91,16 @@ public class Drivetrain extends SubsystemBase {
     private Pigeon2 pigeon2;
 
     private final DifferentialDriveKinematics kinematics;
-    //private final DifferentialDrivePoseEstimator poseEstimator;
+    private final DifferentialDrivePoseEstimator poseEstimator;
 
     public Drivetrain(int lfMotorID, int lbMotorID, int rfMotorID, int rbMotorID, double driveRatio,
             Distance wheelRadius) {
+
+        var match_info = Shuffleboard.getTab("Occra 2026")
+                .getLayout("Match Info", BuiltInLayouts.kList)
+                .withSize(2, 4);
+
+        sb_matchTimer = match_info.add("Match Timer", -1).getEntry();
 
         lfMotor = new SparkMax(lfMotorID, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
         lbMotor = new SparkMax(lbMotorID, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
@@ -96,6 +115,9 @@ public class Drivetrain extends SubsystemBase {
 
         diffDrive = new DifferentialDrive(lfMotor, rfMotor);
         diffDrive.setSafetyEnabled(false);
+
+        navx = new AHRS(NavXComType.kMXP_SPI);
+        navx.resetDisplacement();
 
         SparkMaxConfig lfConfig = new SparkMaxConfig();
         SparkMaxConfig lbConfig = new SparkMaxConfig();
@@ -149,7 +171,7 @@ public class Drivetrain extends SubsystemBase {
                 sysIdCommandDownDyn);
 
         kinematics = new DifferentialDriveKinematics(0);
-        //poseEstimator = new DifferentialDrivePoseEstimator(kinematics, null, 0, 0, new Pose2d());
+        poseEstimator = new DifferentialDrivePoseEstimator(kinematics, navx.getRotation2d(), 0, 0, new Pose2d());
 
     }
 
@@ -216,21 +238,21 @@ public class Drivetrain extends SubsystemBase {
             setStartDistanceR(getRightDistance());
             setStartDistanceL(getLeftDistance());
         })
-        .andThen(
-            this.runEnd(
-                    () -> setDrive(Volts.of(volts.abs(Volts) * (leftBackwards ? -1 : 1)), Volts.of(volts.abs(Volts) * (leftBackwards ? -1 : 1))),
-                    () -> driveRLMotor(Volts.of(0), Volts.of(0))
-                )
-                .until(
-                    () -> (rightBackwards ? right.in(Meters) >= (getRightDistance().in(Meters)
-                                    - this.startDistanceR.in(Meters)) : right.in(Meters) <= (getRightDistance().in(Meters)
-                                    - this.startDistanceR.in(Meters)))
-                                && 
-                                (leftBackwards ? left.in(Meters) >= (getLeftDistance().in(Meters)
-                                    - this.startDistanceL.in(Meters)) : left.in(Meters) <= (getLeftDistance().in(Meters)
-                                    - this.startDistanceL.in(Meters)))
-                )
-        );
+                .andThen(
+                        this.runEnd(
+                                () -> setDrive(Volts.of(volts.abs(Volts) * (leftBackwards ? -1 : 1)),
+                                        Volts.of(volts.abs(Volts) * (leftBackwards ? -1 : 1))),
+                                () -> driveRLMotor(Volts.of(0), Volts.of(0)))
+                                .until(
+                                        () -> (rightBackwards ? right.in(Meters) >= (getRightDistance().in(Meters)
+                                                - this.startDistanceR.in(Meters))
+                                                : right.in(Meters) <= (getRightDistance().in(Meters)
+                                                        - this.startDistanceR.in(Meters)))
+                                                &&
+                                                (leftBackwards ? left.in(Meters) >= (getLeftDistance().in(Meters)
+                                                        - this.startDistanceL.in(Meters))
+                                                        : left.in(Meters) <= (getLeftDistance().in(Meters)
+                                                                - this.startDistanceL.in(Meters)))));
     }
 
     public Angle getRightRotations() {
@@ -249,11 +271,24 @@ public class Drivetrain extends SubsystemBase {
         return Meters.of(getLeftRotations().in(Rotations) * driveRatio * 2 * wheelRadius.in(Meters) * Math.PI);
     }
 
-    
+    public Rotation2d getRotation2d() {
+        return navx.getRotation2d();
+    }
 
-    // public Pose2d getPose() {
-    //     return poseEstimator.getEstimatedPosition();
-    // }
+    public Rotation2d wrapAngle(Rotation2d angle) {
+        double magnitude = angle.getDegrees() % 360;
+
+        if (magnitude >= 180.0)
+            magnitude -= 360.0;
+        else if (magnitude < -180.0)
+            magnitude += 360.0;
+
+        return Rotation2d.fromDegrees(magnitude);
+    }
+
+    public Pose2d getPose() {
+        return poseEstimator.getEstimatedPosition();
+    }
 
     public DifferentialDriveWheelPositions getDriveWheelPositions() {
         return new DifferentialDriveWheelPositions(getLeftDistance(), getRightDistance());
@@ -267,9 +302,9 @@ public class Drivetrain extends SubsystemBase {
         return kinematics.toChassisSpeeds(getDriveWheelSpeeds());
     }
 
-    // public void resetPose(Pose2d pose) {
-    //     poseEstimator.resetPose(pose);
-    // }
+    public void resetPose(Pose2d pose) {
+        poseEstimator.resetPose(pose);
+    }
 
     private void setStartDistanceL(Distance startDistance) {
         this.startDistanceL = startDistance;
@@ -299,6 +334,10 @@ public class Drivetrain extends SubsystemBase {
         return MetersPerSecond.of(rEncoder.getVelocity() / 60 * driveRatio * 2 * wheelRadius.in(Meters) * Math.PI);
     }
 
+    public Rotation2d getWrappedAngle() {
+        return wrapAngle(getRotation2d());
+    }
+
     private void sysIDLogging(SysIdRoutineLog log) {
         log.motor("Drivetrain")
                 .voltage(getLVoltage())
@@ -306,5 +345,22 @@ public class Drivetrain extends SubsystemBase {
                 .linearVelocity(getLRate())
                 .linearPosition(getLeftDistance());
 
+    }
+
+    @Override
+    public void periodic() {
+        poseEstimator.update(getWrappedAngle(), getDriveWheelPositions());
+
+        // SmartDashboard.putNumber("Rotation",
+        // toRotation2d(gyro.getAngle()).getDegrees());
+        // SmartDashboard.putNumber("Raw Rotation", gyro.getAngle());
+        SmartDashboard.putNumber("Gyro Heading", wrapAngle(getRotation2d()).getDegrees());
+        SmartDashboard.putNumber("Left Encoder", lEncoder.getPosition());
+        SmartDashboard.putNumber("Left Distance", getLeftDistance().in(Feet));
+        SmartDashboard.putNumber("Right Distance", getRightDistance().in(Feet));
+        // SmartDashboard.putString("Drivetrain Command", getStringCommand());
+        SmartDashboard.putNumber("Drivetrain Rate", getRRate().in(MetersPerSecond));
+
+        sb_matchTimer.setDouble(DriverStation.getMatchTime());
     }
 }

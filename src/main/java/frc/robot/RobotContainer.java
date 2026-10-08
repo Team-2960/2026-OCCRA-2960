@@ -31,7 +31,7 @@ public class RobotContainer {
 
   public RobotContainer() {
 
-    drivetrain = new Drivetrain(1, 2, 3, 8, 5.95, Inches.of(3));
+    drivetrain = new Drivetrain(1, 2, 3, 8, .168067226891, Inches.of(3));
 
      //intake = new Intake(5);
 
@@ -55,6 +55,8 @@ public class RobotContainer {
     driverCtrl.axisGreaterThan(1, 0.1).or(() -> Math.abs(driverCtrl.getRightY()) >= 0.1)
             .onTrue(
                 drivetrain.getTankDriveCmd(() -> -driverCtrl.getLeftY(), () -> -driverCtrl.getRightY()));
+
+    driverCtrl.x().onTrue(getTestAuton());
      //operatorCtrl.x().whileTrue(intake.getIntakeMotorCmd(() -> Volts.of(6)));
 
      //operatorCtrl.rightTrigger(.1).whileTrue(shooter.getDriveShooterCmd(() -> Volts.of(12)));
@@ -64,7 +66,7 @@ public class RobotContainer {
 
   private Command getTestAuton(){
     return Commands.sequence(
-      drivetrain.getDriveDistanceCmd(Volts.of(4.5), Feet.of(2), Feet.of(8.5)
+      drivetrain.getDriveDistanceCmd(Volts.of(6), Feet.of(8), Feet.of(8)
     ));
   }
 
