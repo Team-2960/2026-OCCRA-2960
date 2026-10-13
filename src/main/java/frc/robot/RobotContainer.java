@@ -23,8 +23,8 @@ public class RobotContainer {
   private final Drivetrain drivetrain;
 
   private final Intake intake;
-  
- // private final Command intakeoff; 
+
+  // private final Command intakeoff;
 
   private final Shooter shooter;
 
@@ -38,85 +38,85 @@ public class RobotContainer {
 
     intake = new Intake(5);
 
-   // intakeoff = intake.getIntakeMotorCmd(() -> Volts.of(0)); Could we set this as a variable to use to shut off intake to simplify code?
+    // intakeoff = intake.getIntakeMotorCmd(() -> Volts.of(0)); Could we set this as
+    // a variable to use to shut off intake to simplify code?
 
-     shooter = new Shooter(6);
-    
+    shooter = new Shooter(6);
+
     driverCtrl = new CommandXboxController(0);
     operatorCtrl = new CommandXboxController(1);
 
     configureBindings();
-  
+
   }
 
   private void configureBindings() {
-    // driverCtrl.axisGreaterThan(1, .05).or(() -> Math.abs(driverCtrl.getRightX()) >= 0.1)
+    // driverCtrl.axisGreaterThan(1, .05).or(() -> Math.abs(driverCtrl.getRightX())
+    // >= 0.1)
     // .whileTrue(
-    //   drivetrain.getDriveRLMotorCmd(
-    //     () -> Volts.of(-MathUtil.applyDeadband(driverCtrl.getRightY() * -12, 0.05)), 
-    //     () -> Volts.of(-MathUtil.applyDeadband(driverCtrl.getLeftY() * -12, 0.05))
-    //   )
+    // drivetrain.getDriveRLMotorCmd(
+    // () -> Volts.of(-MathUtil.applyDeadband(driverCtrl.getRightY() * -12, 0.05)),
+    // () -> Volts.of(-MathUtil.applyDeadband(driverCtrl.getLeftY() * -12, 0.05))
+    // )
     // );
 
-    driverCtrl.axisGreaterThan(1, 0.1).or(() -> Math.abs(driverCtrl.getRightY()) >= 0.1)
-            .onTrue(
-                drivetrain.getTankDriveCmd(() -> -driverCtrl.getLeftY(), () -> -driverCtrl.getRightY()));
-
+    driverCtrl.axisGreaterThan(1, 0.1)
+    .or(() -> Math.abs(driverCtrl.getRightY()) >= 0.1)
+    .onTrue(
+        drivetrain.getTankDriveCmd(
+            () -> driverCtrl.getHID().getLeftBumperButton() ? -driverCtrl.getLeftY() : -driverCtrl.getLeftY() * 0.5,
+            () -> driverCtrl.getHID().getLeftBumperButton() ? -driverCtrl.getRightY() : -driverCtrl.getRightY() * 0.5
+        )
+    );
+    
     driverCtrl.x().onTrue(getTestAuton());
-    //driverCtrl.y().onTrue(JoshAuton());
-     //operatorCtrl.x().whileTrue(intake.getIntakeMotorCmd(() -> Volts.of(6)));
+    // driverCtrl.y().onTrue(JoshAuton());
+    // operatorCtrl.x().whileTrue(intake.getIntakeMotorCmd(() -> Volts.of(6)));
 
-    // operatorCtrl.rightTrigger(.1).whileTrue(shooter.getDriveShooterCmd(() -> Volts.of(12)));
-
+    // operatorCtrl.rightTrigger(.1).whileTrue(shooter.getDriveShooterCmd(() ->
+    // Volts.of(12)));
 
   }
 
-  private Command getTestAuton(){
+  private Command getTestAuton() {
     return Commands.race(
-      drivetrain.getDriveDistanceCmd(Volts.of(6), Feet.of(8), Feet.of(8)
-    ));
+        drivetrain.getDriveDistanceCmd(Volts.of(6), Feet.of(8), Feet.of(8)));
   }
 
-  private Command right4BallAuton(){
+  private Command right4BallAuton() {
     return Commands.sequence(
 
-      //actual values, i used the field model and figured angles with trig, but will need changing and refining.
-      drivetrain.getDriveDistanceCmd(Volts.of(6), Feet.of(7.5), Feet.of(7.5)),
+        // actual values, i used the field model and figured angles with trig, but will
+        // need changing and refining.
+        drivetrain.getDriveDistanceCmd(Volts.of(6), Feet.of(7.5), Feet.of(7.5)),
 
-      drivetrain.getDriveToAnglePIDCmd(Degrees.of(120), Degrees.of(5)),
+        drivetrain.getDriveToAnglePIDCmd(Degrees.of(120), Degrees.of(5)),
 
-      Commands.race(
-        Commands.waitSeconds(3),
-        shooter.getDriveShooterCmd(() -> Volts.of(6))
-      ),
+        Commands.race(
+            Commands.waitSeconds(3),
+            shooter.getDriveShooterCmd(() -> Volts.of(6))),
 
+        drivetrain.getDriveToAnglePIDCmd(Degrees.of(-120), Degrees.of(5)),
 
-      drivetrain.getDriveToAnglePIDCmd(Degrees.of(-120), Degrees.of(5)),
-    
-      drivetrain.getDriveDistanceCmd(Volts.of(6), Feet.of(7.5), Feet.of(7.5)),
+        drivetrain.getDriveDistanceCmd(Volts.of(6), Feet.of(7.5), Feet.of(7.5)),
 
-      drivetrain.getDriveToAnglePIDCmd(Degrees.of(90), Degrees.of(5)),
+        drivetrain.getDriveToAnglePIDCmd(Degrees.of(90), Degrees.of(5)),
 
-      Commands.deadline(
-        drivetrain.getDriveDistanceCmd(Volts.of(6), Feet.of(6.25), Feet.of(6.25)),
-        intake.getIntakeMotorCmd(() -> Volts.of(6))
-      ),
+        Commands.deadline(
+            drivetrain.getDriveDistanceCmd(Volts.of(6), Feet.of(6.25), Feet.of(6.25)),
+            intake.getIntakeMotorCmd(() -> Volts.of(6))),
 
-      drivetrain.getDriveToAnglePIDCmd(Degrees.of(90), Degrees.of(5)),
+        drivetrain.getDriveToAnglePIDCmd(Degrees.of(90), Degrees.of(5)),
 
-      drivetrain.getDriveDistanceCmd(Volts.of(6), Feet.of(7.5), Feet.of(7.5)),
+        drivetrain.getDriveDistanceCmd(Volts.of(6), Feet.of(7.5), Feet.of(7.5)),
 
-      drivetrain.getDriveToAnglePIDCmd(Degrees.of(70), Degrees.of(5)),
+        drivetrain.getDriveToAnglePIDCmd(Degrees.of(70), Degrees.of(5)),
 
-      Commands.race(
-        Commands.waitSeconds(3),
-        shooter.getDriveShooterCmd(() -> Volts.of(6))
-      )
-     );
+        Commands.race(
+            Commands.waitSeconds(3),
+            shooter.getDriveShooterCmd(() -> Volts.of(6))));
 
   }
-
-
 
   public Command getAutonomousCommand() {
     return Commands.print("No autonomous command configured");
