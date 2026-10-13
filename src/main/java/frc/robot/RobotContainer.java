@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Feet;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Volt;
@@ -21,9 +22,11 @@ public class RobotContainer {
 
   private final Drivetrain drivetrain;
 
-  //private final Intake intake;
+  private final Intake intake;
+  
+ // private final Command intakeoff; 
 
-  //private final Shooter shooter;
+  private final Shooter shooter;
 
   private final CommandXboxController driverCtrl;
 
@@ -33,14 +36,17 @@ public class RobotContainer {
 
     drivetrain = new Drivetrain(1, 2, 3, 8, .168067226891, Inches.of(3));
 
-     //intake = new Intake(5);
+    intake = new Intake(5);
 
-     //shooter = new Shooter(6);
+   // intakeoff = intake.getIntakeMotorCmd(() -> Volts.of(0)); Could we set this as a variable to use to shut off intake to simplify code?
+
+     shooter = new Shooter(6);
     
     driverCtrl = new CommandXboxController(0);
     operatorCtrl = new CommandXboxController(1);
 
     configureBindings();
+  
   }
 
   private void configureBindings() {
@@ -57,18 +63,59 @@ public class RobotContainer {
                 drivetrain.getTankDriveCmd(() -> -driverCtrl.getLeftY(), () -> -driverCtrl.getRightY()));
 
     driverCtrl.x().onTrue(getTestAuton());
+    //driverCtrl.y().onTrue(JoshAuton());
      //operatorCtrl.x().whileTrue(intake.getIntakeMotorCmd(() -> Volts.of(6)));
 
-     //operatorCtrl.rightTrigger(.1).whileTrue(shooter.getDriveShooterCmd(() -> Volts.of(12)));
+    // operatorCtrl.rightTrigger(.1).whileTrue(shooter.getDriveShooterCmd(() -> Volts.of(12)));
 
 
   }
 
   private Command getTestAuton(){
-    return Commands.sequence(
+    return Commands.race(
       drivetrain.getDriveDistanceCmd(Volts.of(6), Feet.of(8), Feet.of(8)
     ));
   }
+
+  private Command right4BallAuton(){
+    return Commands.sequence(
+
+      //actual values, i used the field model and figured angles with trig, but will need changing and refining.
+      drivetrain.getDriveDistanceCmd(Volts.of(6), Feet.of(7.5), Feet.of(7.5)),
+
+      drivetrain.getDriveToAnglePIDCmd(Degrees.of(120), Degrees.of(5)),
+
+      Commands.race(
+        Commands.waitSeconds(3),
+        shooter.getDriveShooterCmd(() -> Volts.of(6))
+      ),
+
+
+      drivetrain.getDriveToAnglePIDCmd(Degrees.of(-120), Degrees.of(5)),
+    
+      drivetrain.getDriveDistanceCmd(Volts.of(6), Feet.of(7.5), Feet.of(7.5)),
+
+      drivetrain.getDriveToAnglePIDCmd(Degrees.of(90), Degrees.of(5)),
+
+      Commands.deadline(
+        drivetrain.getDriveDistanceCmd(Volts.of(6), Feet.of(6.25), Feet.of(6.25)),
+        intake.getIntakeMotorCmd(() -> Volts.of(6))
+      ),
+
+      drivetrain.getDriveToAnglePIDCmd(Degrees.of(90), Degrees.of(5)),
+
+      drivetrain.getDriveDistanceCmd(Volts.of(6), Feet.of(7.5), Feet.of(7.5)),
+
+      drivetrain.getDriveToAnglePIDCmd(Degrees.of(70), Degrees.of(5)),
+
+      Commands.race(
+        Commands.waitSeconds(3),
+        shooter.getDriveShooterCmd(() -> Volts.of(6))
+      )
+     );
+
+  }
+
 
 
   public Command getAutonomousCommand() {

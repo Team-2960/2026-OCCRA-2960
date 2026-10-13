@@ -2,6 +2,7 @@ package frc.robot.Subsystems;
 
 import static edu.wpi.first.units.Units.Amp;
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Feet;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
@@ -202,6 +203,12 @@ public class Drivetrain extends SubsystemBase {
 
     }
 
+    public void setAngle(Angle tarAngle) {
+        double rate = anglePID.calculate(getRotation2d().getDegrees(), tarAngle.in(Degrees));
+
+        setDrive(Volts.of(-rate), Volts.of(rate));
+    }
+
     public void setDrive(Voltage left, Voltage right) {
         lfMotor.setVoltage(left);
         rfMotor.setVoltage(right);
@@ -253,6 +260,17 @@ public class Drivetrain extends SubsystemBase {
                                                         - this.startDistanceL.in(Meters))
                                                         : left.in(Meters) <= (getLeftDistance().in(Meters)
                                                                 - this.startDistanceL.in(Meters)))));
+    }
+
+    public Command getDriveToAnglePIDCmd(Angle angle, Angle tolerance) {
+        return this.runEnd(
+                () -> {
+                    setAngle(angle);
+                    System.out.println(angle.minus(getWrappedAngle().getMeasure()).abs(Degrees));
+                },
+                () -> setDrive(Volts.zero(), Volts.zero()))
+                .until(
+                        () -> tolerance.in(Degrees) >= (angle.minus(getWrappedAngle().getMeasure()).abs(Degrees)));
     }
 
     public Angle getRightRotations() {
