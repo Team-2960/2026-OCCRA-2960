@@ -20,18 +20,36 @@ public class Intake extends SubsystemBase{
     
 private final SparkMax intakeMotor;
 
-    public Intake(int intakeMotorID){
+public final SparkMax topIntakeMotor;
+
+    public Intake(int intakeMotorID, int topIntakeMotorID){
 
         intakeMotor = new SparkMax(intakeMotorID, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
+
+        topIntakeMotor = new SparkMax(topIntakeMotorID, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
     
         SparkMaxConfig intakeConfig = new SparkMaxConfig();
 
+        SparkMaxConfig topIntakeConfig = new SparkMaxConfig();
+
+
+
+
+
+
+
         intakeMotor.configure(intakeConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
-    
+
+        topIntakeMotor.configure(topIntakeConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+
     }
 
     public void driveIntakeMotor(Voltage intakeVoltage){
         intakeMotor.setVoltage(intakeVoltage);
+    }
+
+    public void drivetopIntakeMotor(Voltage topIntakeVoltage){
+        topIntakeMotor.setVoltage(topIntakeVoltage);
     }
 
     public Command getIntakeMotorCmd(Supplier<Voltage> intakeVoltage){
@@ -40,6 +58,10 @@ private final SparkMax intakeMotor;
             () -> driveIntakeMotor(Volts.zero())
         );
     }
-
-
+    public Command gettopIntakeMotorCmd(Supplier<Voltage> topIntakeVoltage){
+        return this.runEnd(
+            () -> drivetopIntakeMotor(topIntakeVoltage.get()),
+            () -> drivetopIntakeMotor(Volts.zero())
+        );
+    }
 }
