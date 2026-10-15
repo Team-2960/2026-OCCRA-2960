@@ -36,7 +36,7 @@ public class RobotContainer {
 
     drivetrain = new Drivetrain(1, 2, 3, 8, .168067226891, Inches.of(3));
 
-    intake = new Intake(5);
+    intake = new Intake(6,7);
 
     // intakeoff = intake.getIntakeMotorCmd(() -> Volts.of(0)); Could we set this as
     // a variable to use to shut off intake to simplify code?
@@ -51,14 +51,9 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    // driverCtrl.axisGreaterThan(1, .05).or(() -> Math.abs(driverCtrl.getRightX())
-    // >= 0.1)
-    // .whileTrue(
-    // drivetrain.getDriveRLMotorCmd(
-    // () -> Volts.of(-MathUtil.applyDeadband(driverCtrl.getRightY() * -12, 0.05)),
-    // () -> Volts.of(-MathUtil.applyDeadband(driverCtrl.getLeftY() * -12, 0.05))
-    // )
-    // );
+
+    intake.getIntakeMotorCmd(() -> Volts.of(12));
+
 
     driverCtrl.axisGreaterThan(1, 0.1)
     .or(() -> Math.abs(driverCtrl.getRightY()) >= 0.1)
@@ -70,20 +65,22 @@ public class RobotContainer {
     );
 
     driverCtrl.x().onTrue(getTestAuton());
+
+    operatorCtrl.leftBumper().whileTrue(intake.getIntakeMotorCmd(() ->Volts.of(6.7)));
     // driverCtrl.y().onTrue(JoshAuton());
     // operatorCtrl.x().whileTrue(intake.getIntakeMotorCmd(() -> Volts.of(6)));
 
     // operatorCtrl.rightTrigger(.1).whileTrue(shooter.getDriveShooterCmd(() ->
-    // Volts.of(12)));
+    // Volts.of(12)))
 
   }
 
-  private Command getTestAuton() {
+  public Command getTestAuton() {
     return Commands.race(
         drivetrain.getDriveDistanceCmd(Volts.of(6), Feet.of(8), Feet.of(8)));
   }
 
-  private Command right4PointAuton() { //this is our shorter, 4 point 4 ball auton. 
+  public Command right4PointAuton() { //this is our shorter, 4 point 4 ball auton. 
     return Commands.sequence(
 
         drivetrain.getDriveDistanceCmd(Volts.of(6), Feet.of(7.5), Feet.of(7.5)),
@@ -129,7 +126,7 @@ public class RobotContainer {
   }
 
 
-    private Command right8PointAuton() { //this is our longer, 8 point 4 ball auton. 
+    public Command right8PointAuton() { //this is our longer, 8 point 4 ball auton. 
     return Commands.sequence(
 
         drivetrain.getDriveDistanceCmd(Volts.of(6), Feet.of(7.5), Feet.of(7.5)),
