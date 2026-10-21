@@ -80,95 +80,176 @@ public class RobotContainer {
         drivetrain.getDriveDistanceCmd(Volts.of(6), Feet.of(8), Feet.of(8)));
   }
 
-  public Command right4PointAuton() { //this is our shorter, 4 point 4 ball auton. 
+
+
+   public Command right8PointAutonImprove() { //this is our longer, 8 point 4 ball auton, with greater efficenty. 
     return Commands.sequence(
 
         drivetrain.getDriveDistanceCmd(Volts.of(6), Feet.of(7.5), Feet.of(7.5)),
 
-        drivetrain.getDriveToAnglePIDCmd(Degrees.of(90), Degrees.of(5)),
-
-        drivetrain.getDriveDistanceCmd(Volts.of(6), Inches.of(44), Inches.of(44)),
-
-        drivetrain.getDriveToAnglePIDCmd(Degrees.of(58.1), Degrees.of(5)),
+        drivetrain.getDriveToAnglePIDCmd(Degrees.of(-41.6), Degrees.of(3)),
 
         Commands.race(
             Commands.waitSeconds(3),
             shooter.getDriveShooterCmd(() -> Volts.of(6))),
 
-        drivetrain.getDriveToAnglePIDCmd(Degrees.of(-148.1), Degrees.of(5)),
+        drivetrain.getDriveToAnglePIDCmd(Degrees.of(41.6), Degrees.of(3)),
 
         drivetrain.getDriveDistanceCmd(Volts.of(6), Feet.of(7.5), Feet.of(7.5)),
 
-        drivetrain.getDriveToAnglePIDCmd(Degrees.of(90), Degrees.of(5)),
+        drivetrain.getDriveToAnglePIDCmd(Degrees.of(90), Degrees.of(3)),
 
         Commands.deadline(
-            drivetrain.getDriveDistanceCmd(Volts.of(6), Inches.of(10), Inches.of(10)),
+            drivetrain.getDriveDistanceCmd(Volts.of(6), Inches.of(40), Inches.of(40)),
             intake.getIntakeMotorCmd(() -> Volts.of(6))),
 
         drivetrain.getDriveDistanceCmd(Volts.of(6), Inches.of(-10), Inches.of(-10)),
 
-        drivetrain.getDriveToAnglePIDCmd(Degrees.of(90), Degrees.of(5)),
+        drivetrain.getDriveToAnglePIDCmd(Degrees.of(-90), Degrees.of(3)),
 
-        drivetrain.getDriveDistanceCmd(Volts.of(6), Feet.of(7.5), Feet.of(7.5)),
+        drivetrain.getDriveDistanceCmd(Volts.of(6), Feet.of(-7.5), Feet.of(-7.5)),
 
-        drivetrain.getDriveToAnglePIDCmd(Degrees.of(-21.8), Degrees.of(5)),
+        drivetrain.getDriveToAnglePIDCmd(Degrees.of(-29), Degrees.of(3)),
 
         Commands.race(
             Commands.waitSeconds(3),
             shooter.getDriveShooterCmd(() -> Volts.of(6))),
 
-        drivetrain.getDriveToAnglePIDCmd(Degrees.of(-158.2), Degrees.of(5)),
+        drivetrain.getDriveToAnglePIDCmd(Degrees.of(29), Degrees.of(3)),
 
         drivetrain.getDriveDistanceCmd(Volts.of(6), Feet.of(7.5), Feet.of(7.5)),
 
-        drivetrain.getDriveToAnglePIDCmd(Degrees.of(90), Degrees.of(5))
+        drivetrain.getDriveToAnglePIDCmd(Degrees.of(90), Degrees.of(3))
     );
   }
 
 
-    public Command right8PointAuton() { //this is our longer, 8 point 4 ball auton. 
+
+public Command right4PointAutonImprove() { //this is our longer, 4 point 4 ball auton, with greater efficenty. 
     return Commands.sequence(
 
         drivetrain.getDriveDistanceCmd(Volts.of(6), Feet.of(7.5), Feet.of(7.5)),
 
-        drivetrain.getDriveToAnglePIDCmd(Degrees.of(90), Degrees.of(5)),
-
-        drivetrain.getDriveDistanceCmd(Volts.of(6), Inches.of(44), Inches.of(44)),
-
-        drivetrain.getDriveToAnglePIDCmd(Degrees.of(48.4), Degrees.of(5)),
+        drivetrain.getDriveToAnglePIDCmd(Degrees.of(-14.9), Degrees.of(3)),
 
         Commands.race(
             Commands.waitSeconds(3),
             shooter.getDriveShooterCmd(() -> Volts.of(6))),
 
-        drivetrain.getDriveToAnglePIDCmd(Degrees.of(-131.6), Degrees.of(5)),
+        drivetrain.getDriveToAnglePIDCmd(Degrees.of(14.9), Degrees.of(3)),
 
         drivetrain.getDriveDistanceCmd(Volts.of(6), Feet.of(7.5), Feet.of(7.5)),
 
-        drivetrain.getDriveToAnglePIDCmd(Degrees.of(90), Degrees.of(5)),
+        drivetrain.getDriveToAnglePIDCmd(Degrees.of(90), Degrees.of(3)),
 
         Commands.deadline(
-            drivetrain.getDriveDistanceCmd(Volts.of(6), Inches.of(10), Inches.of(10)),
+            drivetrain.getDriveDistanceCmd(Volts.of(6), Inches.of(40), Inches.of(40)),
             intake.getIntakeMotorCmd(() -> Volts.of(6))),
 
         drivetrain.getDriveDistanceCmd(Volts.of(6), Inches.of(-10), Inches.of(-10)),
 
-        drivetrain.getDriveToAnglePIDCmd(Degrees.of(90), Degrees.of(5)),
+        drivetrain.getDriveToAnglePIDCmd(Degrees.of(-90), Degrees.of(3)),
 
-        drivetrain.getDriveDistanceCmd(Volts.of(6), Feet.of(7.5), Feet.of(7.5)),
+        drivetrain.getDriveDistanceCmd(Volts.of(6), Feet.of(-7.5), Feet.of(-7.5)),
 
-        drivetrain.getDriveToAnglePIDCmd(Degrees.of(-33.7), Degrees.of(5)),
+        drivetrain.getDriveToAnglePIDCmd(Degrees.of(-8.8), Degrees.of(3)),
 
         Commands.race(
             Commands.waitSeconds(3),
             shooter.getDriveShooterCmd(() -> Volts.of(6))),
 
-        drivetrain.getDriveToAnglePIDCmd(Degrees.of(-146.3), Degrees.of(5)),
+        drivetrain.getDriveToAnglePIDCmd(Degrees.of(8.8), Degrees.of(3)),
 
         drivetrain.getDriveDistanceCmd(Volts.of(6), Feet.of(7.5), Feet.of(7.5)),
 
-        drivetrain.getDriveToAnglePIDCmd(Degrees.of(90), Degrees.of(5))
+        drivetrain.getDriveToAnglePIDCmd(Degrees.of(90), Degrees.of(3))
     );
   }
 
+
+
+public Command left8PointAutonImprove() { //this is our longer, 8 point 4 ball auton, with greater efficenty. 
+    return Commands.sequence(
+
+        drivetrain.getDriveDistanceCmd(Volts.of(6), Feet.of(7.5), Feet.of(7.5)),
+
+        drivetrain.getDriveToAnglePIDCmd(Degrees.of(41.6), Degrees.of(3)),
+
+        Commands.race(
+            Commands.waitSeconds(3),
+            shooter.getDriveShooterCmd(() -> Volts.of(6))),
+
+        drivetrain.getDriveToAnglePIDCmd(Degrees.of(-41.6), Degrees.of(3)),
+
+        drivetrain.getDriveDistanceCmd(Volts.of(6), Feet.of(7.5), Feet.of(7.5)),
+
+        drivetrain.getDriveToAnglePIDCmd(Degrees.of(-90), Degrees.of(3)),
+
+        Commands.deadline(
+            drivetrain.getDriveDistanceCmd(Volts.of(6), Inches.of(40), Inches.of(40)),
+            intake.getIntakeMotorCmd(() -> Volts.of(6))),
+
+        drivetrain.getDriveDistanceCmd(Volts.of(6), Inches.of(-10), Inches.of(-10)),
+
+        drivetrain.getDriveToAnglePIDCmd(Degrees.of(90), Degrees.of(3)),
+
+        drivetrain.getDriveDistanceCmd(Volts.of(6), Feet.of(-7.5), Feet.of(-7.5)),
+
+        drivetrain.getDriveToAnglePIDCmd(Degrees.of(29), Degrees.of(3)),
+
+        Commands.race(
+            Commands.waitSeconds(3),
+            shooter.getDriveShooterCmd(() -> Volts.of(6))),
+
+        drivetrain.getDriveToAnglePIDCmd(Degrees.of(-29), Degrees.of(3)),
+
+        drivetrain.getDriveDistanceCmd(Volts.of(6), Feet.of(7.5), Feet.of(7.5)),
+
+        drivetrain.getDriveToAnglePIDCmd(Degrees.of(-90), Degrees.of(3))
+    );
+  }
+
+
+  
+  public Command left4PointAutonImprove() { //this is our longer, 4 point 4 ball auton, with greater efficenty. 
+    return Commands.sequence(
+
+        drivetrain.getDriveDistanceCmd(Volts.of(6), Feet.of(7.5), Feet.of(7.5)),
+
+        drivetrain.getDriveToAnglePIDCmd(Degrees.of(14.9), Degrees.of(3)),
+
+        Commands.race(
+            Commands.waitSeconds(3),
+            shooter.getDriveShooterCmd(() -> Volts.of(6))),
+
+        drivetrain.getDriveToAnglePIDCmd(Degrees.of(-14.9), Degrees.of(3)),
+
+        drivetrain.getDriveDistanceCmd(Volts.of(6), Feet.of(7.5), Feet.of(7.5)),
+
+        drivetrain.getDriveToAnglePIDCmd(Degrees.of(-90), Degrees.of(3)),
+
+        Commands.deadline(
+            drivetrain.getDriveDistanceCmd(Volts.of(6), Inches.of(40), Inches.of(40)),
+            intake.getIntakeMotorCmd(() -> Volts.of(6))),
+
+        drivetrain.getDriveDistanceCmd(Volts.of(6), Inches.of(-10), Inches.of(-10)),
+
+        drivetrain.getDriveToAnglePIDCmd(Degrees.of(90), Degrees.of(3)),
+
+        drivetrain.getDriveDistanceCmd(Volts.of(6), Feet.of(-7.5), Feet.of(-7.5)),
+
+        drivetrain.getDriveToAnglePIDCmd(Degrees.of(8.8), Degrees.of(3)),
+
+        Commands.race(
+            Commands.waitSeconds(3),
+            shooter.getDriveShooterCmd(() -> Volts.of(6))),
+
+        drivetrain.getDriveToAnglePIDCmd(Degrees.of(-8.8), Degrees.of(3)),
+
+        drivetrain.getDriveDistanceCmd(Volts.of(6), Feet.of(7.5), Feet.of(7.5)),
+
+        drivetrain.getDriveToAnglePIDCmd(Degrees.of(-90), Degrees.of(3))
+    );
+  }
 }
+

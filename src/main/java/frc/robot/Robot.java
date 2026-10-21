@@ -33,7 +33,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    m_autonomousCommand = m_robotContainer.right8PointAuton();
+    m_autonomousCommand = m_robotContainer.right8PointAutonImprove();
 
     if (m_autonomousCommand != null) {
       CommandScheduler.getInstance().schedule(m_autonomousCommand);
