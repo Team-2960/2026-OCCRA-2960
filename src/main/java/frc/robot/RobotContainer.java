@@ -64,14 +64,13 @@ public class RobotContainer {
         )
     );
 
-    driverCtrl.x().onTrue(getTestAuton());
+    driverCtrl.x().onTrue(left8PointAutonImprove());
 
-    operatorCtrl.leftBumper().whileTrue(intake.getIntakeMotorCmd(() ->Volts.of(6.7)));
-    // driverCtrl.y().onTrue(JoshAuton());
-    // operatorCtrl.x().whileTrue(intake.getIntakeMotorCmd(() -> Volts.of(6)));
+    operatorCtrl.leftTrigger(.1).whileTrue(intake.getIntakeMotorCmd(() ->Volts.of(-4.8)));
 
-    // operatorCtrl.rightTrigger(.1).whileTrue(shooter.getDriveShooterCmd(() ->
-    // Volts.of(12)))
+    driverCtrl.y().onTrue(right8PointAutonImprove());
+
+    operatorCtrl.rightTrigger(.1).whileTrue(shooter.getDriveShooterCmd(() -> Volts.of(6)));
 
   }
 
