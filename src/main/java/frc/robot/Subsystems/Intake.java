@@ -18,17 +18,17 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Intake extends SubsystemBase{
     
-private final SparkMax intakeMotor;
+private final SparkMax bottomIntakeMotor;
 
 public final SparkMax topIntakeMotor;
 
-    public Intake(int intakeMotorID, int topIntakeMotorID){
+    public Intake(int bottomIntakeMotorID, int topIntakeMotorID){
 
-        intakeMotor = new SparkMax(intakeMotorID, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
+        bottomIntakeMotor = new SparkMax(bottomIntakeMotorID, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
 
         topIntakeMotor = new SparkMax(topIntakeMotorID, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
     
-        SparkMaxConfig intakeConfig = new SparkMaxConfig();
+        SparkMaxConfig bottomIntakeConfig = new SparkMaxConfig();
 
         SparkMaxConfig topIntakeConfig = new SparkMaxConfig();
 
@@ -38,14 +38,15 @@ public final SparkMax topIntakeMotor;
 
 
 
-        intakeMotor.configure(intakeConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+        bottomIntakeMotor.configure(bottomIntakeConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
 
         topIntakeMotor.configure(topIntakeConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
 
     }
 
-    public void driveIntakeMotor(Voltage intakeVoltage){
-        intakeMotor.setVoltage(intakeVoltage);
+    public void driveBothIntakeMotor(Voltage intakeVoltage){
+        bottomIntakeMotor.setVoltage(intakeVoltage);
+        topIntakeMotor.setVoltage(intakeVoltage);
     }
 
     public void drivetopIntakeMotor(Voltage topIntakeVoltage){
@@ -54,11 +55,12 @@ public final SparkMax topIntakeMotor;
 
     public Command getIntakeMotorCmd(Supplier<Voltage> intakeVoltage){
         return this.runEnd(
-            () -> driveIntakeMotor(intakeVoltage.get()),
-            () -> driveIntakeMotor(Volts.zero())
+            () -> driveBothIntakeMotor(intakeVoltage.get()),
+            () -> driveBothIntakeMotor(Volts.zero())
         );
     }
-    public Command gettopIntakeMotorCmd(Supplier<Voltage> topIntakeVoltage){
+
+        public Command gettopIntakeMotorCmd(Supplier<Voltage> topIntakeVoltage){
         return this.runEnd(
             () -> drivetopIntakeMotor(topIntakeVoltage.get()),
             () -> drivetopIntakeMotor(Volts.zero())
