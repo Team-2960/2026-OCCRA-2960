@@ -9,7 +9,7 @@ import static edu.wpi.first.units.Units.Feet;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Volt;
 import static edu.wpi.first.units.Units.Volts;
-import com.pathplanner.lib.auto.AutoBuilder;
+//import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -35,7 +35,7 @@ public class RobotContainer {
 
     private final CommandXboxController operatorCtrl;
 
-    private final SendableChooser<Command> autonChooser;
+//     private final SendableChooser<Command> autonChooser;
 
     public RobotContainer() {
 
@@ -52,10 +52,10 @@ public class RobotContainer {
         driverCtrl = new CommandXboxController(0);
         operatorCtrl = new CommandXboxController(1);
 
-        autonChooser = AutoBuilder.buildAutoChooser();
-        autonChooser.setDefaultOption("None", Commands.print("No autonomous command configured"));
-        autonChooser.addOption("Left Auto 8Pts", left8PointAutonImprove());
-        autonChooser.addOption("Right Auto 8Pts", right8PointAutonImprove());
+        // autonChooser = AutoBuilder.buildAutoChooser();
+        // autonChooser.setDefaultOption("None", Commands.print("No autonomous command configured"));
+        // autonChooser.addOption("Left Auto 8Pts", left8PointAutonImprove());
+        // autonChooser.addOption("Right Auto 8Pts", right8PointAutonImprove());
 
         configureBindings();
 
@@ -72,11 +72,15 @@ public class RobotContainer {
                                 () -> driverCtrl.getHID().getLeftBumperButton() ? -driverCtrl.getRightY()
                                         : -driverCtrl.getRightY() * 0.5));
 
-        driverCtrl.x().onTrue(left8PointAutonImprove());
+        driverCtrl.x().whileTrue(indexer.getIndexCmd(() -> Volts.of(6)));
 
         operatorCtrl.leftTrigger(.1).whileTrue(intake.getIntakeMotorCmd(() -> Volts.of(-12)));
+        operatorCtrl.leftBumper().whileTrue(intake.getIntakeMotorCmd(() -> Volts.of(12)));
 
-        driverCtrl.y().onTrue(right8PointAutonImprove());
+        operatorCtrl.leftTrigger(.1).whileTrue(intake.gettopIntakeMotorCmd(() -> Volts.of(-12)));
+        operatorCtrl.leftBumper().whileTrue(intake.gettopIntakeMotorCmd(() -> Volts.of(12)));
+
+        driverCtrl.b().whileTrue(indexer.getIndexCmd(() -> Volts.of(6)));
 
         operatorCtrl.rightTrigger(.1).whileTrue(shooter.getDriveShooterCmd(() -> Volts.of(6)));
 
@@ -247,7 +251,7 @@ public class RobotContainer {
                 drivetrain.getDriveToAnglePIDCmd(Degrees.of(-90), Degrees.of(3)));
     }
 
-    public Command getAutonomousCommand() {
-        return autonChooser.getSelected();
-    }
+//     public Command getAutonomousCommand() {
+//         return autonChooser.getSelected();
+//     }
 }
