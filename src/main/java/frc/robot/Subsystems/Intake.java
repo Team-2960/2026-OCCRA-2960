@@ -43,14 +43,21 @@ public final SparkMax topIntakeMotor;
         topIntakeMotor.configure(topIntakeConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
 
     }
+      /*   public void driveTopIntakeMotor(Voltage topIntakeVoltage){
+            topIntakeMotor.setVoltage(topIntakeVoltage);
+        }
+   
+         public Command getTopIntakeMotorCmd(Supplier<Voltage> topIntakeVoltage){
+        return this.runEnd(
+            () -> driveTopIntakeMotor(topIntakeVoltage.get()),
+            () -> driveTopIntakeMotor(Volts.zero())
+        );
+    }*/
 
-    public void driveBothIntakeMotor(Voltage intakeVoltage){
+
+          public void driveBothIntakeMotor(Voltage intakeVoltage){
         bottomIntakeMotor.setVoltage(intakeVoltage);
         topIntakeMotor.setVoltage(intakeVoltage);
-    }
-
-    public void drivetopIntakeMotor(Voltage topIntakeVoltage){
-        topIntakeMotor.setVoltage(topIntakeVoltage);
     }
 
     public Command getIntakeMotorCmd(Supplier<Voltage> intakeVoltage){
@@ -60,10 +67,11 @@ public final SparkMax topIntakeMotor;
         );
     }
 
-        public Command gettopIntakeMotorCmd(Supplier<Voltage> topIntakeVoltage){
+   /*  public Command getIntakeMotorCmd(Supplier<Voltage> topintakeVoltage){
         return this.runEnd(
-            () -> drivetopIntakeMotor(topIntakeVoltage.get()),
-            () -> drivetopIntakeMotor(Volts.zero())
+            () -> driveBothIntakeMotor(topintakeVoltage.get()),
+            () -> driveBothIntakeMotor(Volts.zero())
         );
-    }
+    } */
+
 }

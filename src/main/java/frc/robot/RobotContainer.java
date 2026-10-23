@@ -74,11 +74,8 @@ public class RobotContainer {
 
         driverCtrl.x().whileTrue(indexer.getIndexCmd(() -> Volts.of(6)));
 
-        operatorCtrl.leftTrigger(.1).whileTrue(intake.getIntakeMotorCmd(() -> Volts.of(-12)));
-        operatorCtrl.leftBumper().whileTrue(intake.getIntakeMotorCmd(() -> Volts.of(12)));
-
-        operatorCtrl.leftTrigger(.1).whileTrue(intake.gettopIntakeMotorCmd(() -> Volts.of(-12)));
-        operatorCtrl.leftBumper().whileTrue(intake.gettopIntakeMotorCmd(() -> Volts.of(12)));
+        operatorCtrl.leftTrigger(.1).whileTrue(intake.getIntakeMotorCmd(() -> Volts.of(-4.8)));
+        operatorCtrl.leftBumper().whileTrue(intake.getIntakeMotorCmd(() -> Volts.of(4.8)));
 
         driverCtrl.b().whileTrue(indexer.getIndexCmd(() -> Volts.of(6)));
 
