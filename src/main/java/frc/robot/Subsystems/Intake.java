@@ -9,6 +9,7 @@ import com.ctre.phoenix6.sim.TalonFXSimState.MotorType;
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.units.measure.Distance;
@@ -32,11 +33,9 @@ public final SparkMax topIntakeMotor;
 
         SparkMaxConfig topIntakeConfig = new SparkMaxConfig();
 
+        bottomIntakeConfig.inverted(false);
 
-
-
-
-
+        topIntakeConfig.inverted(true);
 
         bottomIntakeMotor.configure(bottomIntakeConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
 
