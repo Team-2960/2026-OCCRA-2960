@@ -2,6 +2,8 @@ package frc.robot.Subsystems;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Minute;
+import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
@@ -53,7 +55,7 @@ public class Shooter extends SubsystemBase {
 
         SparkMaxConfig shooterConfig = new SparkMaxConfig();
 
-        shooterPID = new PIDController(0, 0, 0);
+        shooterPID = new PIDController(2, 0, 0.1);
 
         shooterFF = new SimpleMotorFeedforward(0, 0, 0);
 
@@ -120,20 +122,33 @@ public class Shooter extends SubsystemBase {
         shooterMotor.setVoltage(shooterVoltage);
     }
 
+    public void setRate(AngularVelocity rate) {
+        double pidVolt = shooterPID.calculate(getRate().in(RotationsPerSecond), rate.in(RotationsPerSecond));
+        double ffVolt = shooterFF.calculate(rate.in(RadiansPerSecond));
+
+        setVoltage(Volts.of(pidVolt));
+    }
+
     public Command getSysIdCommandGroup(){
         return sysIdCommandGroup;
     }
 
-    public Command getDriveShooterCmd(Supplier<Voltage> shooterVoltage) {
+    public Command getShooterVoltCmd(Supplier<Voltage> shooterVoltage) {
         return this.runEnd(
                 () -> setVoltage(shooterVoltage.get()),
+                () -> setVoltage(Volts.zero()));
+    }
+
+     public Command getShooterPIDCmd(AngularVelocity shooterVelocity) {
+        return this.runEnd(
+                () -> setRate(shooterVelocity),
                 () -> setVoltage(Volts.zero()));
     }
 
     @Override
     public void periodic(){
         SmartDashboard.putNumber("In Voltage", shooterMotor.getAppliedOutput());
-        SmartDashboard.putNumber("Shooter RPM", getShooterRPM().in(Rotations.per(Minute)));
+        SmartDashboard.putNumber("Shooter RPM", getShooterRPM().in(Rotations.per(Second)));
     }
 
 }

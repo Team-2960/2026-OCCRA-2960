@@ -141,7 +141,7 @@ public class Drivetrain extends SubsystemBase {
 
         drivePID = new PIDController(0, 0, 0);
         driveFF = new SimpleMotorFeedforward(0, 0, 0);
-        anglePID = new PIDController(0, 0, 0);
+        anglePID = new PIDController(0.1, 0, 0); // volts per degree of error, tune on the robot
 
         anglePID.enableContinuousInput(-180, 180);
 
@@ -204,7 +204,7 @@ public class Drivetrain extends SubsystemBase {
     }
 
     public void setAngle(Angle tarAngle) {
-        double rate = anglePID.calculate(getRotation2d().getDegrees(), tarAngle.in(Degrees));
+        double rate = MathUtil.clamp(anglePID.calculate(getRotation2d().getDegrees(), tarAngle.in(Degrees)), -6, 6);
 
         setDrive(Volts.of(-rate), Volts.of(rate));
     }
@@ -262,15 +262,23 @@ public class Drivetrain extends SubsystemBase {
                                                                 - this.startDistanceL.in(Meters)))));
     }
 
+    // Turns by the given angle relative to the heading when the command starts (CCW positive).
     public Command getDriveToAnglePIDCmd(Angle angle, Angle tolerance) {
-        return this.runEnd(
-                () -> {
-                    setAngle(angle);
-                    System.out.println(angle.minus(getWrappedAngle().getMeasure()).abs(Degrees));
-                },
-                () -> setDrive(Volts.zero(), Volts.zero()))
-                .until(
-                        () -> tolerance.in(Degrees) >= (angle.minus(getWrappedAngle().getMeasure()).abs(Degrees)));
+        return this.runOnce(() -> {
+            setStartAngle(getWrappedAngle().getMeasure());
+            anglePID.reset();
+        })
+                .andThen(
+                        this.runEnd(
+                                () -> setAngle(startAngle.plus(angle)),
+                                () -> setDrive(Volts.zero(), Volts.zero()))
+                                .until(() -> tolerance.in(Degrees) >= getAngleError(startAngle.plus(angle))))
+                .withTimeout(3);
+    }
+
+    private double getAngleError(Angle target) {
+        return Math.abs(MathUtil.inputModulus(
+                target.in(Degrees) - getWrappedAngle().getDegrees(), -180, 180));
     }
 
     public Angle getRightRotations() {

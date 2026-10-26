@@ -30,7 +30,6 @@ public final SparkMax topIntakeMotor;
         topIntakeMotor = new SparkMax(topIntakeMotorID, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
     
         SparkMaxConfig bottomIntakeConfig = new SparkMaxConfig();
-
         SparkMaxConfig topIntakeConfig = new SparkMaxConfig();
 
         bottomIntakeConfig.inverted(false);

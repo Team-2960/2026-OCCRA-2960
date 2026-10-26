@@ -7,19 +7,24 @@ package frc.robot;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Feet;
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Minute;
+import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Volt;
 import static edu.wpi.first.units.Units.Volts;
-//import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Subsystems.Drivetrain;
 import frc.robot.Subsystems.Indexer;
 import frc.robot.Subsystems.Intake;
 import frc.robot.Subsystems.Shooter;
+
 
 public class RobotContainer {
 
@@ -35,7 +40,7 @@ public class RobotContainer {
 
     private final CommandXboxController operatorCtrl;
 
-//     private final SendableChooser<Command> autonChooser;
+    private final SendableChooser<Command> autonChooser;
 
     public RobotContainer() {
 
@@ -44,21 +49,21 @@ public class RobotContainer {
         intake = new Intake(5, 6);
 
         indexer = new Indexer(7);
-        // intakeoff = intake.getIntakeMotorCmd(() -> Volts.of(0)); Could we set this as
-        // a variable to use to shut off intake to simplify code?
 
         shooter = new Shooter(8);
 
         driverCtrl = new CommandXboxController(0);
         operatorCtrl = new CommandXboxController(1);
-
-        // autonChooser = AutoBuilder.buildAutoChooser();
-        // autonChooser.setDefaultOption("None", Commands.print("No autonomous command configured"));
-        // autonChooser.addOption("Left Auto 8Pts", left8PointAutonImprove());
-        // autonChooser.addOption("Right Auto 8Pts", right8PointAutonImprove());
+        
+        autonChooser = new SendableChooser<>();
+        autonChooser.setDefaultOption("None", Commands.print("No autonomous command configured"));
+        autonChooser.addOption("Left Auto 8Pts", left8PointAutonImprove());
+        autonChooser.addOption("Right Auto 8Pts", right8PointAutonImprove());
+        autonChooser.addOption("MoveAuton", AutonMove());
 
         configureBindings();
 
+        SmartDashboard.putData("Auton Chooser", autonChooser);
     }
 
     private void configureBindings() {
@@ -72,58 +77,81 @@ public class RobotContainer {
                                 () -> driverCtrl.getHID().getLeftBumperButton() ? -driverCtrl.getRightY()
                                         : -driverCtrl.getRightY() * 0.5));
 
-        driverCtrl.x().whileTrue(indexer.getIndexCmd(() -> Volts.of(6)));
+        operatorCtrl.x().whileTrue(indexer.getIndexCmd(() -> Volts.of(-4)));
 
         operatorCtrl.leftTrigger(.1).whileTrue(intake.getIntakeMotorCmd(() -> Volts.of(-4.8)));
+
         operatorCtrl.leftBumper().whileTrue(intake.getIntakeMotorCmd(() -> Volts.of(4.8)));
 
-        driverCtrl.b().whileTrue(indexer.getIndexCmd(() -> Volts.of(6)));
+        operatorCtrl.b().whileTrue(indexer.getIndexCmd(() -> Volts.of(3)));
 
-        operatorCtrl.rightTrigger(.1).whileTrue(shooter.getDriveShooterCmd(() -> Volts.of(6)));
-
+        operatorCtrl.rightTrigger(.1).whileTrue(shooter.getShooterVoltCmd(() -> Volts.of(12)));
     }
 
-    public Command getTestAuton() {
-        return Commands.race(
-                drivetrain.getDriveDistanceCmd(Volts.of(6), Feet.of(8), Feet.of(8)));
-    }
+     public Command AutonMove() { // this is our longer, 8 point 4 ball auton, with greater efficenty.
+        return Commands.sequence(
+        drivetrain.getDriveDistanceCmd(Volts.of(2), Feet.of(-3), Feet.of(-3))
+        );
+}
 
     public Command right8PointAutonImprove() { // this is our longer, 8 point 4 ball auton, with greater efficenty.
         return Commands.sequence(
 
-                drivetrain.getDriveDistanceCmd(Volts.of(6), Feet.of(7.5), Feet.of(7.5)),
-
+                drivetrain.getDriveDistanceCmd(Volts.of(3), Inches.of(-25), Inches.of(-25)),
+                Commands.waitSeconds(2),
                 drivetrain.getDriveToAnglePIDCmd(Degrees.of(-41.6), Degrees.of(3)),
 
                 Commands.race(
                         Commands.waitSeconds(3),
-                        shooter.getDriveShooterCmd(() -> Volts.of(6))),
+                        indexer.getIndexCmd(() ->Volts.of(3)),
+                        shooter.getShooterVoltCmd(() -> Volts.of(12))),
 
                 drivetrain.getDriveToAnglePIDCmd(Degrees.of(41.6), Degrees.of(3)),
 
-                drivetrain.getDriveDistanceCmd(Volts.of(6), Feet.of(7.5), Feet.of(7.5)),
+                 Commands.waitSeconds(2),
+
+                drivetrain.getDriveDistanceCmd(Volts.of(3), Feet.of(7.5), Feet.of(7.5)),
+
+                Commands.waitSeconds(2),
 
                 drivetrain.getDriveToAnglePIDCmd(Degrees.of(90), Degrees.of(3)),
 
                 Commands.deadline(
                         drivetrain.getDriveDistanceCmd(Volts.of(6), Inches.of(40), Inches.of(40)),
-                        intake.getIntakeMotorCmd(() -> Volts.of(6))),
+                        intake.getIntakeMotorCmd(() -> Volts.of(6)),
+                         indexer.getIndexCmd(() -> Volts.of(6))),
 
-                drivetrain.getDriveDistanceCmd(Volts.of(6), Inches.of(-10), Inches.of(-10)),
+                drivetrain.getDriveDistanceCmd(Volts.of(3), Inches.of(-10), Inches.of(-10)),
+
+                 Commands.waitSeconds(2),
 
                 drivetrain.getDriveToAnglePIDCmd(Degrees.of(-90), Degrees.of(3)),
 
-                drivetrain.getDriveDistanceCmd(Volts.of(6), Feet.of(-7.5), Feet.of(-7.5)),
+                 Commands.waitSeconds(2),
+
+                drivetrain.getDriveDistanceCmd(Volts.of(2), Feet.of(-7.5), Feet.of(-7.5)),
+
+                 Commands.waitSeconds(2),
 
                 drivetrain.getDriveToAnglePIDCmd(Degrees.of(-29), Degrees.of(3)),
 
+                 Commands.waitSeconds(2),
+
+                 Commands.race(
+                        Commands.waitSeconds(.25),
+                        indexer.getIndexCmd(() -> Volts.of(-3))),
+
                 Commands.race(
                         Commands.waitSeconds(3),
-                        shooter.getDriveShooterCmd(() -> Volts.of(6))),
+                        shooter.getShooterVoltCmd(() -> Volts.of(12))),
 
                 drivetrain.getDriveToAnglePIDCmd(Degrees.of(29), Degrees.of(3)),
 
-                drivetrain.getDriveDistanceCmd(Volts.of(6), Feet.of(7.5), Feet.of(7.5)),
+                 Commands.waitSeconds(2),
+
+                drivetrain.getDriveDistanceCmd(Volts.of(3), Feet.of(7.5), Feet.of(7.5)),
+
+                 Commands.waitSeconds(2),
 
                 drivetrain.getDriveToAnglePIDCmd(Degrees.of(90), Degrees.of(3)));
     }
@@ -131,13 +159,14 @@ public class RobotContainer {
     public Command right4PointAutonImprove() { // this is our longer, 4 point 4 ball auton, with greater efficenty.
         return Commands.sequence(
 
-                drivetrain.getDriveDistanceCmd(Volts.of(6), Feet.of(7.5), Feet.of(7.5)),
+                drivetrain.getDriveDistanceCmd(Volts.of(6), Inches.of(25), Inches.of(25)),
 
                 drivetrain.getDriveToAnglePIDCmd(Degrees.of(-14.9), Degrees.of(3)),
 
                 Commands.race(
                         Commands.waitSeconds(3),
-                        shooter.getDriveShooterCmd(() -> Volts.of(6))),
+                        indexer.getIndexCmd(() ->Volts.of(3)),
+                        shooter.getShooterVoltCmd(() -> Volts.of(12))),
 
                 drivetrain.getDriveToAnglePIDCmd(Degrees.of(14.9), Degrees.of(3)),
 
@@ -147,7 +176,8 @@ public class RobotContainer {
 
                 Commands.deadline(
                         drivetrain.getDriveDistanceCmd(Volts.of(6), Inches.of(40), Inches.of(40)),
-                        intake.getIntakeMotorCmd(() -> Volts.of(6))),
+                        intake.getIntakeMotorCmd(() -> Volts.of(6)),
+                        indexer.getIndexCmd(() -> Volts.of(6))),
 
                 drivetrain.getDriveDistanceCmd(Volts.of(6), Inches.of(-10), Inches.of(-10)),
 
@@ -158,8 +188,12 @@ public class RobotContainer {
                 drivetrain.getDriveToAnglePIDCmd(Degrees.of(-8.8), Degrees.of(3)),
 
                 Commands.race(
+                        Commands.waitSeconds(.25),
+                        indexer.getIndexCmd(() -> Volts.of(-3))),
+
+                Commands.race(
                         Commands.waitSeconds(3),
-                        shooter.getDriveShooterCmd(() -> Volts.of(6))),
+                        shooter.getShooterVoltCmd(() -> Volts.of(12))),
 
                 drivetrain.getDriveToAnglePIDCmd(Degrees.of(8.8), Degrees.of(3)),
 
@@ -171,13 +205,14 @@ public class RobotContainer {
     public Command left8PointAutonImprove() { // this is our longer, 8 point 4 ball auton, with greater efficenty.
         return Commands.sequence(
 
-                drivetrain.getDriveDistanceCmd(Volts.of(6), Feet.of(7.5), Feet.of(7.5)),
+                drivetrain.getDriveDistanceCmd(Volts.of(6), Inches.of(25), Inches.of(25)),
 
                 drivetrain.getDriveToAnglePIDCmd(Degrees.of(41.6), Degrees.of(3)),
 
                 Commands.race(
                         Commands.waitSeconds(3),
-                        shooter.getDriveShooterCmd(() -> Volts.of(6))),
+                        indexer.getIndexCmd(() ->Volts.of(3)),
+                        shooter.getShooterVoltCmd(() -> Volts.of(12))),
 
                 drivetrain.getDriveToAnglePIDCmd(Degrees.of(-41.6), Degrees.of(3)),
 
@@ -187,7 +222,8 @@ public class RobotContainer {
 
                 Commands.deadline(
                         drivetrain.getDriveDistanceCmd(Volts.of(6), Inches.of(40), Inches.of(40)),
-                        intake.getIntakeMotorCmd(() -> Volts.of(6))),
+                        intake.getIntakeMotorCmd(() -> Volts.of(6)),
+                         indexer.getIndexCmd(() -> Volts.of(6))),
 
                 drivetrain.getDriveDistanceCmd(Volts.of(6), Inches.of(-10), Inches.of(-10)),
 
@@ -198,8 +234,12 @@ public class RobotContainer {
                 drivetrain.getDriveToAnglePIDCmd(Degrees.of(29), Degrees.of(3)),
 
                 Commands.race(
+                        Commands.waitSeconds(.25),
+                        indexer.getIndexCmd(() -> Volts.of(-3))),
+                        
+                Commands.race(
                         Commands.waitSeconds(3),
-                        shooter.getDriveShooterCmd(() -> Volts.of(6))),
+                        shooter.getShooterVoltCmd(() -> Volts.of(12))),
 
                 drivetrain.getDriveToAnglePIDCmd(Degrees.of(-29), Degrees.of(3)),
 
@@ -211,13 +251,14 @@ public class RobotContainer {
     public Command left4PointAutonImprove() { // this is our longer, 4 point 4 ball auton, with greater efficenty.
         return Commands.sequence(
 
-                drivetrain.getDriveDistanceCmd(Volts.of(6), Feet.of(7.5), Feet.of(7.5)),
+                drivetrain.getDriveDistanceCmd(Volts.of(6), Inches.of(25), Inches.of(25)),
 
                 drivetrain.getDriveToAnglePIDCmd(Degrees.of(14.9), Degrees.of(3)),
 
                 Commands.race(
                         Commands.waitSeconds(3),
-                        shooter.getDriveShooterCmd(() -> Volts.of(6))),
+                        indexer.getIndexCmd(() ->Volts.of(3)),
+                        shooter.getShooterVoltCmd(() -> Volts.of(12))),
 
                 drivetrain.getDriveToAnglePIDCmd(Degrees.of(-14.9), Degrees.of(3)),
 
@@ -227,7 +268,8 @@ public class RobotContainer {
 
                 Commands.deadline(
                         drivetrain.getDriveDistanceCmd(Volts.of(6), Inches.of(40), Inches.of(40)),
-                        intake.getIntakeMotorCmd(() -> Volts.of(6))),
+                        intake.getIntakeMotorCmd(() -> Volts.of(6)),
+                         indexer.getIndexCmd(() -> Volts.of(6))),
 
                 drivetrain.getDriveDistanceCmd(Volts.of(6), Inches.of(-10), Inches.of(-10)),
 
@@ -238,8 +280,12 @@ public class RobotContainer {
                 drivetrain.getDriveToAnglePIDCmd(Degrees.of(8.8), Degrees.of(3)),
 
                 Commands.race(
+                        Commands.waitSeconds(.25),
+                        indexer.getIndexCmd(() -> Volts.of(-3))),
+
+                Commands.race(
                         Commands.waitSeconds(3),
-                        shooter.getDriveShooterCmd(() -> Volts.of(6))),
+                        shooter.getShooterVoltCmd(() -> Volts.of(12))),
 
                 drivetrain.getDriveToAnglePIDCmd(Degrees.of(-8.8), Degrees.of(3)),
 
@@ -248,7 +294,7 @@ public class RobotContainer {
                 drivetrain.getDriveToAnglePIDCmd(Degrees.of(-90), Degrees.of(3)));
     }
 
-//     public Command getAutonomousCommand() {
-//         return autonChooser.getSelected();
-//     }
+    public Command getAutonomousCommand() {
+        return autonChooser.getSelected();
+    }
 }
