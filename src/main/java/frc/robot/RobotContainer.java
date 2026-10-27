@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Subsystems.CommandsManager;
 import frc.robot.Subsystems.Drivetrain;
 import frc.robot.Subsystems.Indexer;
 import frc.robot.Subsystems.Intake;
@@ -36,6 +37,8 @@ public class RobotContainer {
 
     private final Shooter shooter;
 
+    private final CommandsManager commandsManager;
+
     private final CommandXboxController driverCtrl;
 
     private final CommandXboxController operatorCtrl;
@@ -51,6 +54,8 @@ public class RobotContainer {
         indexer = new Indexer(7);
 
         shooter = new Shooter(8);
+
+        commandsManager = new CommandsManager(shooter, indexer, intake);
 
         driverCtrl = new CommandXboxController(0);
         operatorCtrl = new CommandXboxController(1);
@@ -85,7 +90,9 @@ public class RobotContainer {
 
         operatorCtrl.b().whileTrue(indexer.getIndexCmd(() -> Volts.of(3)));
 
-        operatorCtrl.rightTrigger(.1).whileTrue(shooter.getShooterVoltCmd(() -> Volts.of(12)));
+        operatorCtrl.rightTrigger(.1).whileTrue(shooter.getShooterVoltCmd(() -> Volts.of(3.5)));
+
+        operatorCtrl.rightBumper().whileTrue(commandsManager.autoIndexShotCmd());
     }
 
      public Command AutonMove() { // this is our longer, 8 point 4 ball auton, with greater efficenty.

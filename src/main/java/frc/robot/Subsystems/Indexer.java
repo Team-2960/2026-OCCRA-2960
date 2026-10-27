@@ -13,6 +13,7 @@ import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 import com.revrobotics.PersistMode;
@@ -119,6 +120,17 @@ public class Indexer extends SubsystemBase {
     public Command getIndexCmd(Supplier<Voltage> voltage) {
         return this.runEnd(
                 () -> setVoltage(voltage.get()),
+                () -> setVoltage(Volts.zero()));
+    }
+
+    public Command autoIndexCmd(BooleanSupplier enabled) {
+        return this.runEnd(() -> {
+            if (enabled.getAsBoolean()) {
+                setVoltage(Volts.of(3));;
+            } else {
+                setVoltage(Volts.zero());
+            }
+        },
                 () -> setVoltage(Volts.zero()));
     }
 }

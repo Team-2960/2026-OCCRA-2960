@@ -11,6 +11,7 @@ import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Voltage;
@@ -31,6 +32,10 @@ public final SparkMax topIntakeMotor;
     
         SparkMaxConfig bottomIntakeConfig = new SparkMaxConfig();
         SparkMaxConfig topIntakeConfig = new SparkMaxConfig();
+
+        bottomIntakeConfig.idleMode(IdleMode.kBrake);
+
+        topIntakeConfig.idleMode(IdleMode.kBrake);
 
         bottomIntakeConfig.inverted(false);
 
@@ -53,7 +58,7 @@ public final SparkMax topIntakeMotor;
     }*/
 
 
-          public void driveBothIntakeMotor(Voltage intakeVoltage){
+public void driveBothIntakeMotor(Voltage intakeVoltage){
         bottomIntakeMotor.setVoltage(intakeVoltage);
         topIntakeMotor.setVoltage(intakeVoltage);
     }
