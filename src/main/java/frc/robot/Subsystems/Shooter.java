@@ -1,31 +1,27 @@
 package frc.robot.Subsystems;
 
 import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Minute;
 import static edu.wpi.first.units.Units.RPM;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
 import java.util.function.Supplier;
 
-import com.fasterxml.jackson.databind.JsonSerializable.Base;
+import org.littletonrobotics.junction.AutoLogOutput;
+
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.units.BaseUnits;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -67,7 +63,7 @@ public class Shooter extends SubsystemBase {
 
         relEncoder = shooterMotor.getEncoder();
 
-        shooterMotor.configure(shooterConfig, com.revrobotics.ResetMode.kNoResetSafeParameters,
+        shooterMotor.configure(shooterConfig, ResetMode.kNoResetSafeParameters,
                 PersistMode.kPersistParameters);
 
         sysIdRoutine = new SysIdRoutine(
@@ -97,36 +93,32 @@ public class Shooter extends SubsystemBase {
         setDefaultCommand(getShooterVoltCmd(() -> Volts.of(.5)));
     }
 
-    public AngularVelocity getShooterRPM() {
-        return AngularVelocity.ofBaseUnits(relEncoder.getVelocity(), Rotations.per(Minute));
-    }
-
-    public Voltage getIndexVoltage() {
-        return Voltage.ofBaseUnits(shooterMotor.getAppliedOutput() * shooterMotor.getBusVoltage(), Volts);
-    }
-
-    public Current getIndexCurrent() {
-        return Amps.of(shooterMotor.getOutputCurrent());
-    }
-
-    public AngularVelocity getRate() {
-        return AngularVelocity.ofBaseUnits(relEncoder.getVelocity() / 60, RotationsPerSecond);
-    }
-
-    public Angle getIndexerPos() {
-        return Angle.ofBaseUnits(relEncoder.getPosition(), Rotations);
-    }
-
+    @AutoLogOutput
     public AngularVelocity getVelocity() {
         return RPM.of(relEncoder.getVelocity());
     }
 
+    @AutoLogOutput
+    public Angle getShooterPosition() {
+        return Rotations.of(relEncoder.getPosition());
+    }
+
+    @AutoLogOutput
+    public Voltage getShooterVoltage() {
+        return Volts.of(shooterMotor.getAppliedOutput() * shooterMotor.getBusVoltage());
+    }
+
+    @AutoLogOutput
+    public Current getShooterCurrent() {
+        return Amps.of(shooterMotor.getOutputCurrent());
+    }
+
     private void sysIDLogging(SysIdRoutineLog log) {
-        log.motor("Indexer")
-                .voltage(getIndexVoltage())
-                .current(getIndexCurrent())
-                .angularVelocity(getRate())
-                .angularPosition(getIndexerPos());
+        log.motor(getName())
+                .voltage(getShooterVoltage())
+                .current(getShooterCurrent())
+                .angularVelocity(getVelocity())
+                .angularPosition(getShooterPosition());
     }
 
     public void setVoltage(Voltage shooterVoltage) {
@@ -134,10 +126,12 @@ public class Shooter extends SubsystemBase {
     }
 
     public void setRate(AngularVelocity rate) {
-        double pidVolt = shooterPID.calculate(getRate().in(RotationsPerSecond), rate.in(RotationsPerSecond));
-        double ffVolt = shooterFF.calculate(rate.in(RadiansPerSecond));
+        double ffVolt = shooterFF.calculate(rate.in(RotationsPerSecond));
+        double pidVolt = shooterPID.calculate(
+                getVelocity().in(RotationsPerSecond),
+                rate.in(RotationsPerSecond));
 
-        setVoltage(Volts.of(pidVolt));
+        setVoltage(Volts.of(MathUtil.clamp(ffVolt + pidVolt, -12.0, 12.0)));
     }
 
     public Command getSysIdCommandGroup() {
@@ -156,10 +150,10 @@ public class Shooter extends SubsystemBase {
                 () -> setVoltage(Volts.zero()));
     }
 
-    public boolean atVelocity(AngularVelocity tol) {
+    public boolean atVelocity(AngularVelocity target, AngularVelocity tol) {
 
         boolean isNearVel = MathUtil.isNear(
-                relEncoder.getVelocity(),
+                target.in(RotationsPerSecond),
                 getVelocity().in(RotationsPerSecond),
                 tol.in(RotationsPerSecond));
         return isNearVel;
@@ -167,8 +161,8 @@ public class Shooter extends SubsystemBase {
 
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("In Voltage", shooterMotor.getAppliedOutput());
-        SmartDashboard.putNumber("Shooter RPM", getShooterRPM().in(Rotations.per(Minute)));
+        SmartDashboard.putNumber("Shooter Voltage", getShooterVoltage().in(Volts));
+        SmartDashboard.putNumber("Shooter RPM", getVelocity().in(RPM));
     }
 
 }

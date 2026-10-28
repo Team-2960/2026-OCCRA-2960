@@ -90,9 +90,9 @@ public class RobotContainer {
 
         operatorCtrl.b().whileTrue(indexer.getIndexCmd(() -> Volts.of(3)));
 
-        operatorCtrl.rightTrigger(.1).whileTrue(shooter.getShooterVoltCmd(() -> Volts.of(3.5)));
+        operatorCtrl.rightTrigger(.1).whileTrue(commandsManager.highAutoIndexShotCmd());
 
-        operatorCtrl.rightBumper().whileTrue(commandsManager.autoIndexShotCmd());
+        operatorCtrl.rightBumper().whileTrue(commandsManager.lowAutoIndexShotCmd());
     }
 
      public Command AutonMove() { // this is our longer, 8 point 4 ball auton, with greater efficenty.
