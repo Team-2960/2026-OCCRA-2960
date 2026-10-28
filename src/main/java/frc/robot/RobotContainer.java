@@ -77,14 +77,14 @@ public class RobotContainer {
                 .or(() -> Math.abs(driverCtrl.getRightY()) >= 0.1)
                 .onTrue(
                         drivetrain.getTankDriveCmd(
-                                () -> driverCtrl.getHID().getLeftBumperButton() ? -driverCtrl.getLeftY()
-                                        : -driverCtrl.getLeftY() * 0.5,
-                                () -> driverCtrl.getHID().getLeftBumperButton() ? -driverCtrl.getRightY()
-                                        : -driverCtrl.getRightY() * 0.5));
+                                () -> driverCtrl.getHID().getLeftBumperButton() ? -driverCtrl.getLeftY() * .25
+                                        : -driverCtrl.getLeftY() * 0.75,
+                                () -> driverCtrl.getHID().getLeftBumperButton() ? -driverCtrl.getRightY() * .25
+                                        : -driverCtrl.getRightY() * 0.75));
 
         operatorCtrl.x().whileTrue(indexer.getIndexCmd(() -> Volts.of(-4)));
 
-        operatorCtrl.leftTrigger(.1).whileTrue(intake.getIntakeMotorCmd(() -> Volts.of(-4.8)));
+        operatorCtrl.leftTrigger(.1).whileTrue(intake.getIntakeMotorCmd(() -> Volts.of(-12)));
 
         operatorCtrl.leftBumper().whileTrue(intake.getIntakeMotorCmd(() -> Volts.of(4.8)));
 

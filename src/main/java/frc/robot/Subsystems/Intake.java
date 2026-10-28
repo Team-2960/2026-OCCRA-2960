@@ -15,6 +15,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -76,5 +77,7 @@ public void driveBothIntakeMotor(Voltage intakeVoltage){
             () -> driveBothIntakeMotor(Volts.zero())
         );
     } */
-
+    public void periodic() {
+        SmartDashboard.putNumber("Top Intake Voltage", topIntakeMotor.getAppliedOutput());
+    }
 }

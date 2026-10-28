@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Minute;
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.Rotation;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
@@ -160,7 +161,7 @@ public class Shooter extends SubsystemBase {
 
         boolean isNearVel = MathUtil.isNear(
                 relEncoder.getVelocity(),
-                getVelocity().in(RotationsPerSecond),
+                getVelocity().in(Rotations.per(Minute)),
                 tol.in(RotationsPerSecond));
         return isNearVel;
     }
