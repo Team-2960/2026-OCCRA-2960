@@ -158,7 +158,6 @@ public class Shooter extends SubsystemBase {
     }
 
     public boolean atVelocity(AngularVelocity tol) {
-
         boolean isNearVel = MathUtil.isNear(
                 relEncoder.getVelocity(),
                 getVelocity().in(Rotations.per(Minute)),
@@ -169,7 +168,7 @@ public class Shooter extends SubsystemBase {
     @Override
     public void periodic() {
         SmartDashboard.putNumber("In Voltage", shooterMotor.getAppliedOutput());
-        SmartDashboard.putNumber("Shooter RPM", getShooterRPM().in(Rotations.per(Minute)));
+        SmartDashboard.putNumber("Shooter RPM", getShooterRPM().in(Rotations.per(Second)));
     }
 
 }

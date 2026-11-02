@@ -77,14 +77,15 @@ public class RobotContainer {
                 .or(() -> Math.abs(driverCtrl.getRightY()) >= 0.1)
                 .onTrue(
                         drivetrain.getTankDriveCmd(
-                                () -> driverCtrl.getHID().getLeftBumperButton() ? -driverCtrl.getLeftY() * .25
+                                () -> driverCtrl.getHID().getLeftBumperButton() ? -driverCtrl.getLeftY() * .4
                                         : -driverCtrl.getLeftY() * 0.75,
-                                () -> driverCtrl.getHID().getLeftBumperButton() ? -driverCtrl.getRightY() * .25
+                                () -> driverCtrl.getHID().getLeftBumperButton() ? -driverCtrl.getRightY() * .4
                                         : -driverCtrl.getRightY() * 0.75));
 
         operatorCtrl.x().whileTrue(indexer.getIndexCmd(() -> Volts.of(-4)));
 
-        operatorCtrl.leftTrigger(.1).whileTrue(intake.getIntakeMotorCmd(() -> Volts.of(-12)));
+        operatorCtrl.leftTrigger(.1).whileTrue(intake.getIntakeMotorCmd(() -> Volts.of
+        (-12)));
 
         operatorCtrl.leftBumper().whileTrue(intake.getIntakeMotorCmd(() -> Volts.of(4.8)));
 
@@ -92,14 +93,50 @@ public class RobotContainer {
 
         operatorCtrl.rightTrigger(.1).whileTrue(shooter.getShooterVoltCmd(() -> Volts.of(3.5)));
 
-        operatorCtrl.rightBumper().whileTrue(commandsManager.autoIndexShotCmd());
+        operatorCtrl.povUp().whileTrue(ShooterAdjust());
+
+        operatorCtrl.povDown().whileTrue(ShooterBackup());
+
+        driverCtrl.a().whileTrue(Test());
+
+     //   operatorCtrl.rightTrigger(.1).whileTrue(commandsManager.highAutoIndexShotCmd());
+
+       // operatorCtrl.rightBumper().whileTrue(commandsManager.lowAutoIndexShotCmd());
     }
 
      public Command AutonMove() { // this is our longer, 8 point 4 ball auton, with greater efficenty.
         return Commands.sequence(
         drivetrain.getDriveDistanceCmd(Volts.of(2), Feet.of(-3), Feet.of(-3))
         );
+     }
+
+
+public Command ShooterBackup() { // this is our longer, 8 point 4 ball auton, with greater efficenty.
+        return Commands.sequence(
+        drivetrain.getDriveDistanceCmd(Volts.of(3), Inches.of(3), Inches.of(3))
+        );
 }
+
+public Command Test() { // this is our longer, 8 point 4 ball auton, with greater efficenty.
+        return Commands.sequence(
+        drivetrain.getDriveToAnglePIDCmd(Degrees.of(90),Degrees.of(5)
+        ));
+}
+
+public Command ShooterAdjust() { // this is our longer, 8 point 4 ball auton, with greater efficenty.
+        return Commands.sequence(
+        drivetrain.getDriveDistanceCmd(Volts.of(4), Inches.of(8), Inches.of(8)),
+
+        drivetrain.getDriveToAnglePIDCmd(Degrees.of(30),Degrees.of(3)),
+
+        drivetrain.getDriveDistanceCmd(Volts.of(4), Inches.of(-2), Inches.of(-2)),
+
+         drivetrain.getDriveToAnglePIDCmd(Degrees.of(-30),Degrees.of(3)),
+
+        drivetrain.getDriveDistanceCmd(Volts.of(4), Inches.of(-4), Inches.of(-4))
+        );
+}
+
 
     public Command right8PointAutonImprove() { // this is our longer, 8 point 4 ball auton, with greater efficenty.
         return Commands.sequence(

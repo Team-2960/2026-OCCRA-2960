@@ -2,13 +2,11 @@ package frc.robot.Subsystems;
 
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkFlexConfig;
-import com.revrobotics.spark.config.SparkParameters;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
-import static edu.wpi.first.units.Units.Amp;
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
@@ -54,7 +52,7 @@ public class Indexer extends SubsystemBase {
 
         indexerPID = new PIDController(0, 0, 0);
 
-        indexerFF = new SimpleMotorFeedforward(indexerMotorID, indexerMotorID, indexerMotorID);
+        indexerFF = new SimpleMotorFeedforward(0, 0, 0);
 
         relEncoder = indexMotor.getEncoder();
         
@@ -90,7 +88,7 @@ public class Indexer extends SubsystemBase {
     }
 
     public Voltage getIndexVoltage(){
-        return Voltage.ofBaseUnits(indexMotor.getAppliedOutput() * indexMotor.getBusVoltage(), Volts);
+        return Volts.of(indexMotor.getAppliedOutput() * indexMotor.getBusVoltage());
     }
 
     public Current getIndexCurrent(){
@@ -98,15 +96,15 @@ public class Indexer extends SubsystemBase {
     }
 
     public AngularVelocity getRate(){
-        return AngularVelocity.ofBaseUnits(relEncoder.getVelocity()/60, RotationsPerSecond);
+        return RPM.of(relEncoder.getVelocity());
     }
 
     public Angle getIndexerPos(){
-        return Angle.ofBaseUnits(relEncoder.getPosition(), Rotations);
+        return Rotations.of(relEncoder.getPosition());
     }
 
     private void sysIDLogging(SysIdRoutineLog log) {
-        log.motor("Indexer")
+        log.motor(getName())
                 .voltage(getIndexVoltage())
                 .current(getIndexCurrent())
                 .angularVelocity(getRate())

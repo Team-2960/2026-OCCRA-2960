@@ -141,7 +141,7 @@ public class Drivetrain extends SubsystemBase {
 
         drivePID = new PIDController(0, 0, 0);
         driveFF = new SimpleMotorFeedforward(0, 0, 0);
-        anglePID = new PIDController(0.1, 0, 0); // volts per degree of error, tune on the robot
+        anglePID = new PIDController(0.05, 0.01, 0.03); // volts per degree of error, tune on the robot
 
         anglePID.enableContinuousInput(-180, 180);
 
