@@ -24,6 +24,7 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.studica.frc.AHRS;
 import com.studica.frc.AHRS.NavXComType;
+import com.ctre.phoenix6.hardware.Pigeon2;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
@@ -83,19 +84,17 @@ public class Drivetrain extends SubsystemBase {
     private final SimpleMotorFeedforward driveFF;
     private final PIDController anglePID;
 
-    private AHRS navx;
+    private final Pigeon2 pigeon;
 
     private Distance startDistanceL = Meters.of(0);
     private Distance startDistanceR = Meters.of(0);
     private Angle startAngle = Rotations.zero();
 
-    private Pigeon2 pigeon2;
-
     private final DifferentialDriveKinematics kinematics;
     private final DifferentialDrivePoseEstimator poseEstimator;
 
     public Drivetrain(int lfMotorID, int lbMotorID, int rfMotorID, int rbMotorID, double driveRatio,
-            Distance wheelRadius) {
+            Distance wheelRadius, int pidgeonID) {
 
         var match_info = Shuffleboard.getTab("Occra 2026")
                 .getLayout("Match Info", BuiltInLayouts.kList)
@@ -117,8 +116,8 @@ public class Drivetrain extends SubsystemBase {
         diffDrive = new DifferentialDrive(lfMotor, rfMotor);
         diffDrive.setSafetyEnabled(false);
 
-        navx = new AHRS(NavXComType.kMXP_SPI);
-        navx.resetDisplacement();
+        pigeon = new Pigeon2(pidgeonID, "rio");
+        pigeon.reset();
 
         SparkMaxConfig lfConfig = new SparkMaxConfig();
         SparkMaxConfig lbConfig = new SparkMaxConfig();
@@ -141,7 +140,7 @@ public class Drivetrain extends SubsystemBase {
 
         drivePID = new PIDController(0, 0, 0);
         driveFF = new SimpleMotorFeedforward(0, 0, 0);
-        anglePID = new PIDController(0.05, 0.01, 0.03); // volts per degree of error, tune on the robot
+        anglePID = new PIDController(0.1, 0.01, 0.02); // volts per degree of error, tune on the robot
 
         anglePID.enableContinuousInput(-180, 180);
 
@@ -172,7 +171,7 @@ public class Drivetrain extends SubsystemBase {
                 sysIdCommandDownDyn);
 
         kinematics = new DifferentialDriveKinematics(0);
-        poseEstimator = new DifferentialDrivePoseEstimator(kinematics, navx.getRotation2d(), 0, 0, new Pose2d());
+        poseEstimator = new DifferentialDrivePoseEstimator(kinematics, pigeon.getRotation2d(), 0, 0, new Pose2d());
 
     }
 
@@ -209,6 +208,10 @@ public class Drivetrain extends SubsystemBase {
         setDrive(Volts.of(-rate), Volts.of(rate));
     }
 
+    public void resetPigeon(){
+        pigeon.reset();
+    }
+
     public void setDrive(Voltage left, Voltage right) {
         lfMotor.setVoltage(left);
         rfMotor.setVoltage(right);
@@ -222,6 +225,10 @@ public class Drivetrain extends SubsystemBase {
     public void setTankDrive(double leftStick, double rightStick) {
         diffDrive.tankDrive(leftStick, rightStick);
         diffDrive.feed();
+    }
+
+    public Command getResetPigeonCmd(){
+        return this.run(()-> resetPigeon());
     }
 
     public Command getDriveRLMotorCmd(Supplier<Voltage> rVoltage, Supplier<Voltage> lVoltage) {
@@ -298,7 +305,7 @@ public class Drivetrain extends SubsystemBase {
     }
 
     public Rotation2d getRotation2d() {
-        return navx.getRotation2d();
+        return pigeon.getRotation2d();
     }
 
     public Rotation2d wrapAngle(Rotation2d angle) {
@@ -380,7 +387,7 @@ public class Drivetrain extends SubsystemBase {
         // SmartDashboard.putNumber("Rotation",
         // toRotation2d(gyro.getAngle()).getDegrees());
         // SmartDashboard.putNumber("Raw Rotation", gyro.getAngle());
-        SmartDashboard.putNumber("Gyro Heading", wrapAngle(getRotation2d()).getDegrees());
+        SmartDashboard.putNumber("Gyro Heading",  wrapAngle(getRotation2d()).getDegrees());
         SmartDashboard.putNumber("Left Encoder", lEncoder.getPosition());
         SmartDashboard.putNumber("Left Distance", getLeftDistance().in(Feet));
         SmartDashboard.putNumber("Right Distance", getRightDistance().in(Feet));

@@ -1,6 +1,7 @@
 package frc.robot.Subsystems;
 
 import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -10,8 +11,8 @@ public class CommandsManager {
 
     
     private static final AngularVelocity lowShotVelocity = RPM.of(400);
-    private static final AngularVelocity highSVelocity = RPM.of(600);
-    private static final AngularVelocity shotTolerance = RPM.of(40);
+    private static final AngularVelocity highSVelocity = RPM.of(1940);
+    private static final AngularVelocity shotTolerance = RPM.of(25);
 
     private final Shooter shooter;
     private final Indexer indexer;
@@ -34,7 +35,7 @@ public class CommandsManager {
 
     public Command highAutoIndexShotCmd(){
         return Commands.parallel(
-            shooter.getShooterPIDCmd(highSVelocity),
+            shooter.getShooterVoltCmd(() -> Volts.of(3.5)),
             indexer.autoIndexCmd(this::highIsShooterReady)
         );
     }

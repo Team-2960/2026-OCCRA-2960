@@ -111,7 +111,7 @@ public class Shooter extends SubsystemBase {
     }
 
     public AngularVelocity getRate() {
-        return AngularVelocity.ofBaseUnits(relEncoder.getVelocity() / 60, RotationsPerSecond);
+        return AngularVelocity.ofBaseUnits(relEncoder.getVelocity(), RPM);
     }
 
     public Angle getIndexerPos() {
@@ -157,10 +157,10 @@ public class Shooter extends SubsystemBase {
                 () -> setVoltage(Volts.zero()));
     }
 
-    public boolean atVelocity(AngularVelocity tol) {
+    public boolean atVelocity(AngularVelocity setVel,AngularVelocity tol) {
         boolean isNearVel = MathUtil.isNear(
-                relEncoder.getVelocity(),
-                getVelocity().in(Rotations.per(Minute)),
+                setVel.in(RotationsPerSecond),
+                getVelocity().in(RotationsPerSecond),
                 tol.in(RotationsPerSecond));
         return isNearVel;
     }
@@ -168,7 +168,7 @@ public class Shooter extends SubsystemBase {
     @Override
     public void periodic() {
         SmartDashboard.putNumber("In Voltage", shooterMotor.getAppliedOutput());
-        SmartDashboard.putNumber("Shooter RPM", getShooterRPM().in(Rotations.per(Second)));
+        SmartDashboard.putNumber("Shooter RPM", getVelocity().in(RPM));
     }
 
 }
