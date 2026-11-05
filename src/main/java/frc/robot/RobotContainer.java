@@ -151,18 +151,35 @@ public Command ShooterAdjust() { // this is our longer, 8 point 4 ball auton, wi
 
     public Command center4ball(){
         return Commands.sequence(
-                Commands.race(drivetrain.getDriveDistanceCmd(Volts.of(3), Inches.of(-65), Inches.of(-65)),
+                Commands.race(drivetrain.getDriveDistanceCmd(Volts.of(3), Inches.of(-63), Inches.of(-63)),
                         shooter.getShooterVoltCmd(() -> Volts.of(3.5))),
 
                 Commands.race(Commands.waitSeconds(.5),
-                shooter.getShooterVoltCmd(() -> Volts.of(3.5))),
+                        shooter.getShooterVoltCmd(() -> Volts.of(3.5))),
 
                 Commands.race(Commands.waitSeconds(.2),
                         indexer.getIndexCmd(() ->Volts.of(3)),
                         shooter.getShooterVoltCmd(() -> Volts.of(3.5))),
 
                 Commands.race(Commands.waitSeconds(.8),
-                shooter.getShooterVoltCmd(() -> Volts.of(3.5))),
+                        shooter.getShooterVoltCmd(() -> Volts.of(3.5))),
+
+                 Commands.race(Commands.waitSeconds(1),
+                        indexer.getIndexCmd(() ->Volts.of(3)),
+                        shooter.getShooterVoltCmd(() -> Volts.of(3.5))),
+
+                 Commands.race(drivetrain.getDriveDistanceCmd(Volts.of(3), Inches.of(140), Inches.of(140)),
+                        intake.getIntakeMotorCmd(() -> Volts.of(3))),
+
+                Commands.race(drivetrain.getDriveDistanceCmd(Volts.of(3), Inches.of(-134), Inches.of(-134)),
+                        shooter.getShooterVoltCmd(() -> Volts.of(3.5))),
+
+                Commands.race(Commands.waitSeconds(.2),
+                        indexer.getIndexCmd(() ->Volts.of(3)),
+                        shooter.getShooterVoltCmd(() -> Volts.of(3.5))),
+
+                Commands.race(Commands.waitSeconds(.8),
+                        shooter.getShooterVoltCmd(() -> Volts.of(3.5))),
 
                  Commands.race(Commands.waitSeconds(1),
                         indexer.getIndexCmd(() ->Volts.of(3)),
