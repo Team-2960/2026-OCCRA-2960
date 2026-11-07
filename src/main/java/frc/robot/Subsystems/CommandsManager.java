@@ -3,6 +3,8 @@ package frc.robot.Subsystems;
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Volts;
 
+import java.util.function.BooleanSupplier;
+
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -33,17 +35,17 @@ public class CommandsManager {
         return shooter.atVelocity(lowShotVelocity, shotTolerance);
     }
 
-    public Command highAutoIndexShotCmd(){
+    public Command highAutoIndexShotCmd(BooleanSupplier bButtBooleanSupplier){
         return Commands.parallel(
-            shooter.getShooterVoltCmd(() -> Volts.of(3.5)),
-            indexer.autoIndexCmd(this::highIsShooterReady)
+           shooter.getSpeedShotCmd(RPM.of(1940), RPM.of(100), RPM.of(100)),
+            indexer.autoIndexCmd(this::highIsShooterReady, bButtBooleanSupplier)
         );
     }
-
-    public Command lowAutoIndexShotCmd(){
+    
+    public Command lowAutoIndexShotCmd(BooleanSupplier bButtBooleanSupplier){
         return Commands.parallel(
             shooter.getShooterPIDCmd(lowShotVelocity),
-            indexer.autoIndexCmd(this::lowIsShooterReady)
+            indexer.autoIndexCmd(this::highIsShooterReady, bButtBooleanSupplier)
         );
     }
 }

@@ -121,9 +121,9 @@ public class Indexer extends SubsystemBase {
                 () -> setVoltage(Volts.zero()));
     }
 
-    public Command autoIndexCmd(BooleanSupplier enabled) {
+    public Command autoIndexCmd(BooleanSupplier enabled, BooleanSupplier bButtBooleanSupplier) {
         return this.runEnd(() -> {
-            if (enabled.getAsBoolean()) {
+            if (enabled.getAsBoolean() && bButtBooleanSupplier.getAsBoolean()) {
                 setVoltage(Volts.of(3));;
             } else {
                 setVoltage(Volts.zero());

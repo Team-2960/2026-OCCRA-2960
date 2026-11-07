@@ -8,9 +8,14 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Feet;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Minute;
+import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Volt;
 import static edu.wpi.first.units.Units.Volts;
+
+import java.util.function.BooleanSupplier;
+
+import com.ctre.phoenix6.CANBus;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -24,6 +29,7 @@ import frc.robot.Subsystems.CommandsManager;
 import frc.robot.Subsystems.Drivetrain;
 import frc.robot.Subsystems.Indexer;
 import frc.robot.Subsystems.Intake;
+import frc.robot.Subsystems.IntakeRoller;
 import frc.robot.Subsystems.RangeSensor;
 import frc.robot.Subsystems.Shooter;
 
@@ -33,6 +39,8 @@ public class RobotContainer {
     private final Drivetrain drivetrain;
 
     private final Intake intake;
+
+    private final IntakeRoller intakeRoller;
 
     private final Indexer indexer;
 
@@ -52,11 +60,13 @@ public class RobotContainer {
 
         drivetrain = new Drivetrain(1, 2, 3, 4, .168067226891, Inches.of(3), 15);
 
-        intake = new Intake(5, 6);
+        intake = new Intake(5);
 
         indexer = new Indexer(7);
 
         shooter = new Shooter(8);
+
+        intakeRoller = new IntakeRoller(6, CANBus.roboRIO(), .6);
 
         rangeSensor = new RangeSensor();
 
@@ -71,6 +81,7 @@ public class RobotContainer {
         autonChooser.addOption("Right Auto 8Pts", right8PointAutonImprove());
         autonChooser.addOption("MoveAuton", AutonMove());
         autonChooser.addOption("Center 8Pts", center4ball());
+        autonChooser.addOption("TestIntake", TestIntake());
 
         configureBindings();
 
@@ -92,24 +103,31 @@ public class RobotContainer {
 
         operatorCtrl.leftTrigger(.1).whileTrue(intake.getIntakeMotorCmd(() -> Volts.of
         (-12)));
+        
+        BooleanSupplier bButtonSupplier = operatorCtrl.b();
 
         operatorCtrl.leftBumper().whileTrue(intake.getIntakeMotorCmd(() -> Volts.of(4.8)));
+    
+        operatorCtrl.rightBumper().whileTrue(shooter.getShooterVoltCmd(() -> Volts.of(3.5)));
 
-        operatorCtrl.b().whileTrue(indexer.getIndexCmd(() -> Volts.of(3)));
+        operatorCtrl.rightTrigger(.1).whileTrue(commandsManager.highAutoIndexShotCmd(bButtonSupplier));
 
-        operatorCtrl.rightTrigger(.1).whileTrue(shooter.getShooterVoltCmd(() -> Volts.of(3.5)));
+        operatorCtrl.povLeft().whileTrue(ShooterBackupLeft());
 
-        operatorCtrl.rightBumper().whileTrue(commandsManager.highAutoIndexShotCmd());
-
-        operatorCtrl.povUp().whileTrue(ShooterAdjust());
+        operatorCtrl.povRight().whileTrue(ShooterBackupRight());
 
         operatorCtrl.povDown().whileTrue(ShooterBackup());
 
+        operatorCtrl.leftTrigger(.1).whileTrue(intakeRoller.intakeInCmd());
+
+        operatorCtrl.leftBumper().whileTrue(intakeRoller.intakeOutCmd());
+
+        operatorCtrl.rightBumper().whileTrue(shooter.getSpeedShotCmd(RPM.of(1940), RPM.of(100), RPM.of(100)));
+
         driverCtrl.a().onTrue(shooter.getSysIdCommandGroup());
 
-        driverCtrl.b().onTrue(testAuton());
-
         driverCtrl.x().whileTrue(drivetrain.getResetPigeonCmd());
+
 
      //   operatorCtrl.rightTrigger(.1).whileTrue(commandsManager.highAutoIndexShotCmd());
 
@@ -122,31 +140,33 @@ public class RobotContainer {
         );
      }
 
-
 public Command ShooterBackup() { // this is our longer, 8 point 4 ball auton, with greater efficenty.
         return Commands.sequence(
         drivetrain.getDriveDistanceCmd(Volts.of(3), Inches.of(3), Inches.of(3))
         );
 }
 
-public Command testAuton() { // this is our longer, 8 point 4 ball auton, with greater efficenty.
+public Command ShooterBackupRight() { // this is our longer, 8 point 4 ball auton, with greater efficenty.
         return Commands.sequence(
-        drivetrain.getDriveToAnglePIDCmd(Degrees.of(90),Degrees.of(1)
-        ));
+        drivetrain.getDriveDistanceCmd(Volts.of(4), Inches.of(2.5), Inches.of(2.5)),
+
+        drivetrain.getDriveToAnglePIDCmd(Degrees.of(-20),Degrees.of(3))
+        );
 }
 
-public Command ShooterAdjust() { // this is our longer, 8 point 4 ball auton, with greater efficenty.
+public Command ShooterBackupLeft() { // this is our longer, 8 point 4 ball auton, with greater efficenty.
         return Commands.sequence(
-        drivetrain.getDriveDistanceCmd(Volts.of(4), Inches.of(8), Inches.of(8)),
+        drivetrain.getDriveDistanceCmd(Volts.of(4), Inches.of(2.5), Inches.of(2.5)),
 
-        drivetrain.getDriveToAnglePIDCmd(Degrees.of(30),Degrees.of(3)),
-
-        drivetrain.getDriveDistanceCmd(Volts.of(4), Inches.of(-2), Inches.of(-2)),
-
-         drivetrain.getDriveToAnglePIDCmd(Degrees.of(-30),Degrees.of(3)),
-
-        drivetrain.getDriveDistanceCmd(Volts.of(4), Inches.of(-4), Inches.of(-4))
+        drivetrain.getDriveToAnglePIDCmd(Degrees.of(20),Degrees.of(3))
         );
+}
+
+public Command TestIntake(){
+        return Commands.race(
+                Commands.waitSeconds(4),
+                intakeRoller.intakeInCmd(),
+                intake.getIntakeMotorCmd(() -> Volts.of(3)));
 }
 
     public Command center4ball(){
@@ -169,9 +189,12 @@ public Command ShooterAdjust() { // this is our longer, 8 point 4 ball auton, wi
                         shooter.getShooterVoltCmd(() -> Volts.of(3.5))),
 
                  Commands.race(drivetrain.getDriveDistanceCmd(Volts.of(3), Inches.of(140), Inches.of(140)),
-                        intake.getIntakeMotorCmd(() -> Volts.of(3))),
+                        intake.getIntakeMotorCmd(() -> Volts.of(3)),
+                        intakeRoller.intakeInCmd()),
 
                 Commands.race(drivetrain.getDriveDistanceCmd(Volts.of(3), Inches.of(-134), Inches.of(-134)),
+                         intake.getIntakeMotorCmd(() -> Volts.of(3)),
+                         intakeRoller.intakeInCmd(),
                         shooter.getShooterVoltCmd(() -> Volts.of(3.5))),
 
                 Commands.race(Commands.waitSeconds(.2),

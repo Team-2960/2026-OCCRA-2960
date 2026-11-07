@@ -23,13 +23,13 @@ public class Intake extends SubsystemBase{
     
 private final SparkMax bottomIntakeMotor;
 
-public final SparkMax topIntakeMotor;
+//public final SparkMax topIntakeMotor;
 
-    public Intake(int bottomIntakeMotorID, int topIntakeMotorID){
+    public Intake(int bottomIntakeMotorID){
 
         bottomIntakeMotor = new SparkMax(bottomIntakeMotorID, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
 
-        topIntakeMotor = new SparkMax(topIntakeMotorID, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
+        //topIntakeMotor = new SparkMax(topIntakeMotorID, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
     
         SparkMaxConfig bottomIntakeConfig = new SparkMaxConfig();
         SparkMaxConfig topIntakeConfig = new SparkMaxConfig();
@@ -44,7 +44,7 @@ public final SparkMax topIntakeMotor;
 
         bottomIntakeMotor.configure(bottomIntakeConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
 
-        topIntakeMotor.configure(topIntakeConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+        //topIntakeMotor.configure(topIntakeConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
 
     }
       /*   public void driveTopIntakeMotor(Voltage topIntakeVoltage){
@@ -61,7 +61,7 @@ public final SparkMax topIntakeMotor;
 
 public void driveBothIntakeMotor(Voltage intakeVoltage){
         bottomIntakeMotor.setVoltage(intakeVoltage);
-        topIntakeMotor.setVoltage(intakeVoltage);
+        //topIntakeMotor.setVoltage(intakeVoltage);
     }
 
     public Command getIntakeMotorCmd(Supplier<Voltage> intakeVoltage){
@@ -78,6 +78,6 @@ public void driveBothIntakeMotor(Voltage intakeVoltage){
         );
     } */
     public void periodic() {
-        SmartDashboard.putNumber("Top Intake Voltage", topIntakeMotor.getAppliedOutput());
+        SmartDashboard.putNumber("Top Intake Voltage", bottomIntakeMotor.getAppliedOutput());
     }
 }

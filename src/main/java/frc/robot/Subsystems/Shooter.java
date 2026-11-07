@@ -10,6 +10,7 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Volt;
 import static edu.wpi.first.units.Units.Volts;
 
 import java.util.function.Supplier;
@@ -157,7 +158,25 @@ public class Shooter extends SubsystemBase {
                 () -> setVoltage(Volts.zero()));
     }
 
-    public boolean atVelocity(AngularVelocity setVel,AngularVelocity tol) {
+    public Command getSpeedShotCmd(AngularVelocity targetVel, AngularVelocity floorThreshold,
+            AngularVelocity ceilingThreshold) {
+        return this.runEnd(
+                () -> {
+                    AngularVelocity curVel = getVelocity();
+                    AngularVelocity targetVelVal = targetVel;
+                    if (targetVelVal.minus(floorThreshold).gt(curVel)) {
+                        setVoltage(Volts.of(12));
+                        ;
+                    } else if (targetVelVal.plus(ceilingThreshold).lt(curVel)) {
+                        setVoltage(Volts.zero());
+                    } else {
+                        setVoltage(Volts.of(3.5));
+                    }
+                },
+                () -> setVoltage(Volts.zero()));
+    }
+
+    public boolean atVelocity(AngularVelocity setVel, AngularVelocity tol) {
         boolean isNearVel = MathUtil.isNear(
                 setVel.in(RotationsPerSecond),
                 getVelocity().in(RotationsPerSecond),
