@@ -248,25 +248,27 @@ public class Drivetrain extends SubsystemBase {
         boolean leftBackwards = left.magnitude() < 0;
         boolean rightBackwards = right.magnitude() < 0;
 
+        Supplier<Boolean> isLeftDone = () -> leftBackwards
+                ? left.in(Meters) >= (getLeftDistance().in(Meters) - this.startDistanceL.in(Meters))
+                : left.in(Meters) <= (getLeftDistance().in(Meters) - this.startDistanceL.in(Meters));
+
+        Supplier<Boolean> isRightDone = () -> rightBackwards
+                ? right.in(Meters) >= (getRightDistance().in(Meters) - this.startDistanceR.in(Meters))
+                : right.in(Meters) <= (getRightDistance().in(Meters) - this.startDistanceR.in(Meters));
+
         return this.runOnce(() -> {
             setStartDistanceR(getRightDistance());
             setStartDistanceL(getLeftDistance());
         })
                 .andThen(
                         this.runEnd(
-                                () -> setDrive(Volts.of(volts.abs(Volts) * (leftBackwards ? -1 : 1)),
-                                        Volts.of(volts.abs(Volts) * (leftBackwards ? -1 : 1))),
+                                () -> driveRLMotor(
+                                        isRightDone.get() ? Volts.of(0)
+                                                : Volts.of(volts.abs(Volts) * (rightBackwards ? -1 : 1)),
+                                        isLeftDone.get() ? Volts.of(0)
+                                                : Volts.of(volts.abs(Volts) * (leftBackwards ? -1 : 1))),
                                 () -> driveRLMotor(Volts.of(0), Volts.of(0)))
-                                .until(
-                                        () -> (rightBackwards ? right.in(Meters) >= (getRightDistance().in(Meters)
-                                                - this.startDistanceR.in(Meters))
-                                                : right.in(Meters) <= (getRightDistance().in(Meters)
-                                                        - this.startDistanceR.in(Meters)))
-                                                &&
-                                                (leftBackwards ? left.in(Meters) >= (getLeftDistance().in(Meters)
-                                                        - this.startDistanceL.in(Meters))
-                                                        : left.in(Meters) <= (getLeftDistance().in(Meters)
-                                                                - this.startDistanceL.in(Meters)))));
+                                .until(() -> isLeftDone.get() && isRightDone.get()));
     }
 
     // Turns by the given angle relative to the heading when the command starts (CCW positive).
