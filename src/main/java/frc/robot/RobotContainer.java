@@ -115,11 +115,11 @@ public class RobotContainer {
 
         operatorCtrl.rightTrigger(.1).whileTrue(commandsManager.highAutoIndexShotCmd(bButtonSupplier));
 
-        operatorCtrl.povLeft().whileTrue(ShooterBackupLeft());
+        operatorCtrl.povLeft().onTrue(ShooterBackupLeft());
 
-        operatorCtrl.povRight().whileTrue(ShooterBackupRight());
+        operatorCtrl.povRight().onTrue(ShooterBackupRight());
 
-        operatorCtrl.povDown().whileTrue(ShooterBackup());
+        operatorCtrl.povDown().onTrue(ShooterBackup());
 
         operatorCtrl.leftTrigger(.1).whileTrue(intakeRoller.intakeInCmd());
 

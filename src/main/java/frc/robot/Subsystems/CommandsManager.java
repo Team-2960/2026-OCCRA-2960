@@ -37,7 +37,7 @@ public class CommandsManager {
 
     public Command highAutoIndexShotCmd(BooleanSupplier bButtBooleanSupplier){
         return Commands.parallel(
-           shooter.getSpeedShotCmd(RPM.of(1940), RPM.of(100), RPM.of(100)),
+           shooter.getSpeedShotCmd(RPM.of(1920), RPM.of(100), RPM.of(100)),
             indexer.autoIndexCmd(this::highIsShooterReady, bButtBooleanSupplier)
         );
     }
