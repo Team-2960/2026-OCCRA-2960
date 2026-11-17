@@ -22,6 +22,7 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.studica.frc.AHRS;
 import com.studica.frc.AHRS.NavXComType;
 import com.ctre.phoenix6.hardware.Pigeon2;
@@ -127,6 +128,11 @@ public class Drivetrain extends SubsystemBase {
         rbConfig.follow(rfMotor);
         lbConfig.follow(lfMotor);
 
+        lfConfig.idleMode(IdleMode.kBrake);
+        lbConfig.idleMode(IdleMode.kBrake);
+        rfConfig.idleMode(IdleMode.kBrake);
+        rbConfig.idleMode(IdleMode.kBrake);
+
         lfMotor.configure(lfConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
         lbMotor.configure(lbConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
         rfMotor.configure(rfConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
@@ -138,7 +144,7 @@ public class Drivetrain extends SubsystemBase {
         lEncoder.setPosition(0);
         rEncoder.setPosition(0);
 
-        drivePID = new PIDController(0, 0, 0);
+        drivePID = new PIDController(0.1, 0.01, 0.02);
         driveFF = new SimpleMotorFeedforward(0, 0, 0);
         anglePID = new PIDController(0.1, 0.01, 0.02); // volts per degree of error, tune on the robot
 

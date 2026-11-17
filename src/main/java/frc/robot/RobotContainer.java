@@ -111,7 +111,7 @@ public class RobotContainer {
 
         operatorCtrl.leftBumper().whileTrue(intake.getIntakeMotorCmd(() -> Volts.of(4.8)));
     
-        operatorCtrl.rightBumper().whileTrue(shooter.getShooterVoltCmd(() -> Volts.of(3.5)));
+        operatorCtrl.rightBumper().whileTrue(shooter.getShooterVoltCmd(() -> Volts.of(3.7)));
 
         operatorCtrl.rightTrigger(.1).whileTrue(commandsManager.highAutoIndexShotCmd(bButtonSupplier));
 
@@ -145,13 +145,13 @@ public class RobotContainer {
 
 public Command ShooterBackup() { // this is our longer, 8 point 4 ball auton, with greater efficenty.
         return Commands.sequence(
-        drivetrain.getDriveDistanceCmd(Volts.of(3), Inches.of(3), Inches.of(3))
+        drivetrain.getDriveDistanceCmd(Volts.of(3), Inches.of(3.5), Inches.of(3.3))
         );
 }
 
 public Command ShooterBackupRight() { // this is our longer, 8 point 4 ball auton, with greater efficenty.
         return Commands.sequence(
-        drivetrain.getDriveDistanceCmd(Volts.of(4), Inches.of(2.5), Inches.of(2.5)),
+        drivetrain.getDriveDistanceCmd(Volts.of(4), Inches.of(2.5), Inches.of(2.3)),
 
         drivetrain.getDriveToAnglePIDCmd(Degrees.of(-20),Degrees.of(3))
         );
@@ -159,7 +159,7 @@ public Command ShooterBackupRight() { // this is our longer, 8 point 4 ball auto
 
 public Command ShooterBackupLeft() { // this is our longer, 8 point 4 ball auton, with greater efficenty.
         return Commands.sequence(
-        drivetrain.getDriveDistanceCmd(Volts.of(4), Inches.of(2.5), Inches.of(2.5)),
+        drivetrain.getDriveDistanceCmd(Volts.of(4), Inches.of(2), Inches.of(2)),
 
         drivetrain.getDriveToAnglePIDCmd(Degrees.of(20),Degrees.of(3))
         );
