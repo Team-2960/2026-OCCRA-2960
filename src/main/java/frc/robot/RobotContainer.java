@@ -110,8 +110,6 @@ public class RobotContainer {
         BooleanSupplier bButtonSupplier = operatorCtrl.b();
 
         operatorCtrl.leftBumper().whileTrue(intake.getIntakeMotorCmd(() -> Volts.of(4.8)));
-    
-        operatorCtrl.rightBumper().whileTrue(shooter.getShooterVoltCmd(() -> Volts.of(3.7)));
 
         operatorCtrl.rightTrigger(.1).whileTrue(commandsManager.highAutoIndexShotCmd(bButtonSupplier));
 
@@ -125,7 +123,9 @@ public class RobotContainer {
 
         operatorCtrl.leftBumper().whileTrue(intakeRoller.intakeOutCmd());
 
-        operatorCtrl.rightBumper().whileTrue(shooter.getSpeedShotCmd(RPM.of(1940), RPM.of(100), RPM.of(100)));
+        //operatorCtrl.rightBumper().whileTrue(shooter.getSpeedShotCmd(RPM.of(2540), RPM.of(100), RPM.of(100)));
+
+        operatorCtrl.rightBumper().whileTrue(shooter.getShooterPIDCmd(RPM.of(1940)));
 
         driverCtrl.a().onTrue(shooter.getSysIdCommandGroup());
 

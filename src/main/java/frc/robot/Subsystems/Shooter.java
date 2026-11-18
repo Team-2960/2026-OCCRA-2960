@@ -13,6 +13,7 @@ import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volt;
 import static edu.wpi.first.units.Units.Volts;
 
+import java.rmi.server.RMIClassLoader;
 import java.util.function.Supplier;
 
 import com.fasterxml.jackson.databind.JsonSerializable.Base;
@@ -63,7 +64,7 @@ public class Shooter extends SubsystemBase {
 
         shooterConfig.idleMode(IdleMode.kBrake);
 
-        shooterPID = new PIDController(2, 0, 0.1);
+        shooterPID = new PIDController(.2, 0, .08);
 
         shooterFF = new SimpleMotorFeedforward(0.1, 0, 0);
 
@@ -100,7 +101,7 @@ public class Shooter extends SubsystemBase {
     }
 
     public AngularVelocity getShooterRPM() {
-        return AngularVelocity.ofBaseUnits(relEncoder.getVelocity(), Rotations.per(Minute));
+        return Rotations.per(Minute).of(relEncoder.getVelocity());
     }
 
     public Voltage getIndexVoltage() {
@@ -112,11 +113,11 @@ public class Shooter extends SubsystemBase {
     }
 
     public AngularVelocity getRate() {
-        return AngularVelocity.ofBaseUnits(relEncoder.getVelocity(), RPM);
+        return RPM.of(relEncoder.getVelocity());
     }
 
     public Angle getIndexerPos() {
-        return Angle.ofBaseUnits(relEncoder.getPosition(), Rotations);
+        return Rotations.of(relEncoder.getPosition());
     }
 
     public AngularVelocity getVelocity() {
@@ -136,10 +137,10 @@ public class Shooter extends SubsystemBase {
     }
 
     public void setRate(AngularVelocity rate) {
-        double pidVolt = shooterPID.calculate(getRate().in(RotationsPerSecond), rate.in(RotationsPerSecond));
+        double pidVolt = shooterPID.calculate(getRate().in(RPM), rate.in(RPM));
         double ffVolt = shooterFF.calculate(rate.in(RadiansPerSecond));
 
-        setVoltage(Volts.of(pidVolt));
+        setVoltage(Volts.of(pidVolt + ffVolt));
     }
 
     public Command getSysIdCommandGroup() {
@@ -173,7 +174,7 @@ public class Shooter extends SubsystemBase {
                         setVoltage(Volts.of(3.5));
                     }
                 },
-                () -> setVoltage(Volts.zero()));
+                () -> setVoltage(Volts.of(3.5)));
     }
 
     public boolean atVelocity(AngularVelocity setVel, AngularVelocity tol) {
