@@ -13,7 +13,7 @@ public class CommandsManager {
 
     
     private static final AngularVelocity lowShotVelocity = RPM.of(400);
-    private static final AngularVelocity highSVelocity = RPM.of(1940);
+    private static final AngularVelocity highSVelocity = RPM.of(1995);
     private static final AngularVelocity shotTolerance = RPM.of(25);
 
     private final Shooter shooter;
@@ -37,7 +37,7 @@ public class CommandsManager {
 
     public Command highAutoIndexShotCmd(BooleanSupplier bButtBooleanSupplier){
         return Commands.parallel(
-           shooter.getSpeedShotCmd(RPM.of(1920), RPM.of(100), RPM.of(100)),
+           shooter.getSpeedShotCmd(RPM.of(1995), RPM.of(100), RPM.of(100)),
             indexer.autoIndexCmd(this::highIsShooterReady, bButtBooleanSupplier)
         );
     }

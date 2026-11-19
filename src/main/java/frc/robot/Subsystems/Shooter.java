@@ -171,10 +171,10 @@ public class Shooter extends SubsystemBase {
                     } else if (targetVelVal.plus(ceilingThreshold).lt(curVel)) {
                         setVoltage(Volts.zero());
                     } else {
-                        setVoltage(Volts.of(3.5));
+                        setVoltage(Volts.of(3.6));
                     }
                 },
-                () -> setVoltage(Volts.of(3.5)));
+                () -> setVoltage(Volts.of(3.6)));
     }
 
     public boolean atVelocity(AngularVelocity setVel, AngularVelocity tol) {

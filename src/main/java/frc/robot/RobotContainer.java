@@ -84,6 +84,7 @@ public class RobotContainer {
         autonChooser.addOption("MoveAuton", AutonMove());
         autonChooser.addOption("center4ball", center4ball());
         autonChooser.addOption("LeftAuton", Left4Ball());
+         autonChooser.addOption("RightAuton", Right4Ball());
         
 
         configureBindings();
@@ -125,7 +126,7 @@ public class RobotContainer {
 
         //operatorCtrl.rightBumper().whileTrue(shooter.getSpeedShotCmd(RPM.of(2540), RPM.of(100), RPM.of(100)));
 
-        operatorCtrl.rightBumper().whileTrue(shooter.getShooterPIDCmd(RPM.of(1940)));
+        operatorCtrl.rightBumper().whileTrue(shooter.getShooterVoltCmd(() -> Volts.of(3.6)));
 
         driverCtrl.a().onTrue(shooter.getSysIdCommandGroup());
 
@@ -145,7 +146,7 @@ public class RobotContainer {
 
 public Command ShooterBackup() { // this is our longer, 8 point 4 ball auton, with greater efficenty.
         return Commands.sequence(
-        drivetrain.getDriveDistanceCmd(Volts.of(3), Inches.of(3.5), Inches.of(3.3))
+        drivetrain.getDriveDistanceCmd(Volts.of(3), Inches.of(4.0), Inches.of(3.8))
         );
 }
 
@@ -174,23 +175,23 @@ public Command TestIntake(){
  public Command Right4Ball(){
         return Commands.sequence(
                 Commands.race(drivetrain.getDriveDistanceCmd(Volts.of(3), Inches.of(-63), Inches.of(-59)),
-                        shooter.getShooterVoltCmd(() -> Volts.of(3.5))),
+                        shooter.getShooterVoltCmd(() -> Volts.of(3.6))),
 
-                 Commands.race(drivetrain.getDriveToAnglePIDCmd(Degrees.of(-30),Degrees.of(3)),
-                 shooter.getShooterVoltCmd(() -> Volts.of(3.5))),
+                 Commands.race(drivetrain.getDriveToAnglePIDCmd(Degrees.of(30),Degrees.of(3)),
+                 shooter.getShooterVoltCmd(() -> Volts.of(3.6))),
 
                 Commands.race(Commands.waitSeconds(.2),
                         indexer.getIndexCmd(() ->Volts.of(3)),
-                        shooter.getShooterVoltCmd(() -> Volts.of(3.5))),
+                        shooter.getShooterVoltCmd(() -> Volts.of(3.6))),
 
                 Commands.race(Commands.waitSeconds(.8),
-                        shooter.getShooterVoltCmd(() -> Volts.of(3.5))),
+                        shooter.getShooterVoltCmd(() -> Volts.of(3.6))),
 
                  Commands.race(Commands.waitSeconds(1),
                         indexer.getIndexCmd(() ->Volts.of(3)),
-                        shooter.getShooterVoltCmd(() -> Volts.of(3.5))),
+                        shooter.getShooterVoltCmd(() -> Volts.of(3.6))),
 
-                drivetrain.getDriveToAnglePIDCmd(Degrees.of(30),Degrees.of(3)),
+                drivetrain.getDriveToAnglePIDCmd(Degrees.of(-30),Degrees.of(3)),
 
                 Commands.race(drivetrain.getDriveDistanceCmd(Volts.of(3), Inches.of(139), Inches.of(141)),
                         intake.getIntakeMotorCmd(() -> Volts.of(3)),
@@ -205,7 +206,7 @@ public Command TestIntake(){
                          intakeRoller.intakeInCmd(),
                         shooter.getShooterVoltCmd(() -> Volts.of(3.5))),
 
-                 Commands.race(drivetrain.getDriveToAnglePIDCmd(Degrees.of(-30),Degrees.of(3)),
+                 Commands.race(drivetrain.getDriveToAnglePIDCmd(Degrees.of(30),Degrees.of(3)),
                  shooter.getShooterVoltCmd(() -> Volts.of(3.5))),
 
                 Commands.race(Commands.waitSeconds(.2),
@@ -228,18 +229,18 @@ public Command TestIntake(){
                         shooter.getShooterVoltCmd(() -> Volts.of(3.5))),
 
                  Commands.race(drivetrain.getDriveToAnglePIDCmd(Degrees.of(-30),Degrees.of(3)),
-                 shooter.getShooterVoltCmd(() -> Volts.of(3.5))),
+                 shooter.getShooterVoltCmd(() -> Volts.of(3.6))),
 
                 Commands.race(Commands.waitSeconds(.2),
                         indexer.getIndexCmd(() ->Volts.of(3)),
-                        shooter.getShooterVoltCmd(() -> Volts.of(3.5))),
+                        shooter.getShooterVoltCmd(() -> Volts.of(3.6))),
 
                 Commands.race(Commands.waitSeconds(.8),
-                        shooter.getShooterVoltCmd(() -> Volts.of(3.5))),
+                        shooter.getShooterVoltCmd(() -> Volts.of(3.6))),
 
                  Commands.race(Commands.waitSeconds(1),
                         indexer.getIndexCmd(() ->Volts.of(3)),
-                        shooter.getShooterVoltCmd(() -> Volts.of(3.5))),
+                        shooter.getShooterVoltCmd(() -> Volts.of(3.6))),
 
                 drivetrain.getDriveToAnglePIDCmd(Degrees.of(30),Degrees.of(3)),
 
@@ -254,21 +255,21 @@ public Command TestIntake(){
                 Commands.race(drivetrain.getDriveDistanceCmd(Volts.of(3), Inches.of(-131), Inches.of(-135)),
                          intake.getIntakeMotorCmd(() -> Volts.of(3)),
                          intakeRoller.intakeInCmd(),
-                        shooter.getShooterVoltCmd(() -> Volts.of(3.5))),
+                        shooter.getShooterVoltCmd(() -> Volts.of(3.6))),
 
                  Commands.race(drivetrain.getDriveToAnglePIDCmd(Degrees.of(-30),Degrees.of(3)),
-                 shooter.getShooterVoltCmd(() -> Volts.of(3.5))),
+                 shooter.getShooterVoltCmd(() -> Volts.of(3.6))),
 
                 Commands.race(Commands.waitSeconds(.2),
                         indexer.getIndexCmd(() ->Volts.of(3)),
-                        shooter.getShooterVoltCmd(() -> Volts.of(3.5))),
+                        shooter.getShooterVoltCmd(() -> Volts.of(3.6))),
 
                 Commands.race(Commands.waitSeconds(.8),
-                        shooter.getShooterVoltCmd(() -> Volts.of(3.5))),
+                        shooter.getShooterVoltCmd(() -> Volts.of(3.6))),
 
                  Commands.race(Commands.waitSeconds(1),
                         indexer.getIndexCmd(() ->Volts.of(3)),
-                        shooter.getShooterVoltCmd(() -> Volts.of(3.5)))
+                        shooter.getShooterVoltCmd(() -> Volts.of(3.6)))
                 
                 );
 }
@@ -276,21 +277,21 @@ public Command TestIntake(){
     public Command center4ball(){
         return Commands.sequence(
                 Commands.race(drivetrain.getDriveDistanceCmd(Volts.of(3), Inches.of(-66), Inches.of(-62)),
-                        shooter.getShooterVoltCmd(() -> Volts.of(3.5))),
+                        shooter.getShooterVoltCmd(() -> Volts.of(3.6))),
 
                 Commands.race(Commands.waitSeconds(.5),
-                        shooter.getShooterVoltCmd(() -> Volts.of(3.5))),
+                        shooter.getShooterVoltCmd(() -> Volts.of(3.6))),
 
                 Commands.race(Commands.waitSeconds(.2),
                         indexer.getIndexCmd(() ->Volts.of(3)),
-                        shooter.getShooterVoltCmd(() -> Volts.of(3.5))),
+                        shooter.getShooterVoltCmd(() -> Volts.of(3.6))),
 
                 Commands.race(Commands.waitSeconds(.8),
-                        shooter.getShooterVoltCmd(() -> Volts.of(3.5))),
+                        shooter.getShooterVoltCmd(() -> Volts.of(3.6))),
 
                  Commands.race(Commands.waitSeconds(1),
                         indexer.getIndexCmd(() ->Volts.of(3)),
-                        shooter.getShooterVoltCmd(() -> Volts.of(3.5))),
+                        shooter.getShooterVoltCmd(() -> Volts.of(3.6))),
 
                  Commands.race(drivetrain.getDriveDistanceCmd(Volts.of(3), Inches.of(142), Inches.of(144)),
                         intake.getIntakeMotorCmd(() -> Volts.of(3)),
@@ -303,18 +304,21 @@ public Command TestIntake(){
                 Commands.race(drivetrain.getDriveDistanceCmd(Volts.of(3), Inches.of(-134), Inches.of(-138)),
                          intake.getIntakeMotorCmd(() -> Volts.of(3)),
                          intakeRoller.intakeInCmd(),
-                        shooter.getShooterVoltCmd(() -> Volts.of(3.5))),
+                        shooter.getShooterVoltCmd(() -> Volts.of(3.6))),
+
+                Commands.race(drivetrain.getDriveToAnglePIDCmd(Degrees.of(30), Degrees.of(3)),
+                shooter.getShooterVoltCmd(() -> Volts.of(3.6))),
 
                 Commands.race(Commands.waitSeconds(.2),
                         indexer.getIndexCmd(() ->Volts.of(3)),
-                        shooter.getShooterVoltCmd(() -> Volts.of(3.5))),
+                        shooter.getShooterVoltCmd(() -> Volts.of(3.6))),
 
                 Commands.race(Commands.waitSeconds(.8),
-                        shooter.getShooterVoltCmd(() -> Volts.of(3.5))),
+                        shooter.getShooterVoltCmd(() -> Volts.of(3.6))),
 
                  Commands.race(Commands.waitSeconds(1),
                         indexer.getIndexCmd(() ->Volts.of(3)),
-                        shooter.getShooterVoltCmd(() -> Volts.of(3.5)))
+                        shooter.getShooterVoltCmd(() -> Volts.of(3.6)))
 
         );
 }
