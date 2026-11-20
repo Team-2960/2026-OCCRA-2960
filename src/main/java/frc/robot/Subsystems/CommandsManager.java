@@ -1,6 +1,7 @@
 package frc.robot.Subsystems;
 
 import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.Volt;
 import static edu.wpi.first.units.Units.Volts;
 
 import java.util.function.BooleanSupplier;
@@ -46,6 +47,13 @@ public class CommandsManager {
         return Commands.parallel(
             shooter.getShooterPIDCmd(lowShotVelocity),
             indexer.autoIndexCmd(this::highIsShooterReady, bButtBooleanSupplier)
+        );
+    }
+
+        public Command autonLowAutoIndexShotCmd(){
+        return Commands.parallel(
+            shooter.getSpeedShotCmd(RPM.of(1940), RPM.of(100), RPM.of(100)),
+            indexer.autonAutoIndexCmd(this::highIsShooterReady)
         );
     }
 }
